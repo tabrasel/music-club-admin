@@ -1,11 +1,17 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark px-3">
 
-  <a class="navbar-brand" href="#">Music Club Editor</a>
+  <a class="navbar-brand" routerLink="/rounds">Music Club Editor</a>
 
-  <div class="navbar-nav">
-    <a class="nav-item nav-link" href="#">Rounds</a>
-    <a class="nav-item nav-link" href="#">Members</a>
-    <a class="nav-item nav-link" href="#">Visuals</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" routerLink="/rounds">Rounds</a>
+      <a class="nav-item nav-link" routerLink="/members">Members</a>
+      <a class="nav-item nav-link" routerLink="/visuals">Visuals</a>
+    </div>
   </div>
 
 </nav>
