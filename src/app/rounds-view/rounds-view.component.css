@@ -1,0 +1,64 @@
+h1, p {
+  margin: 0px;
+}
+
+.round-icon {
+  min-width: 128px;
+  min-height: 128px;
+  max-width: 128px;
+  max-height: 128px;
+  background-color: lightgray;
+  box-shadow: lightgray 0px 0px 5px;
+}
+
+.particpant-icon {
+  display: inline;
+}
+
+.particpant-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  border: 1px solid black;
+  border-radius: 50%;
+}
+
+#add-round-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+}
+
+.album-icon {
+  width: 148px;
+  height: 148px;
+}
+
+.album-list-item {
+  cursor: pointer;
+}
+
+.list-group-item {
+  cursor: pointer;
+}
+
+.list-group {
+  display: inline-block;
+}
+
+#help {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+}
+
+#edit-round-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 5%;
+  border: none;
+}

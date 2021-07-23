@@ -1,0 +1,90 @@
+<div class="h-100 row g-0">
+
+  <div class="h-100 p-2 col-4 d-flex flex-column">
+
+    <div class="w-100 mb-2 d-flex justify-content-between align-items-center">
+      <h1>Rounds</h1>
+      <button id="add-round-button" type="button" name="button">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+
+    <div class="h-100 flex-grow-1 position-relative">
+      <div class="h-100 list-group overflow-auto" id="help">
+
+        <div class="list-group-item list-group-item-action round-list-item d-flex p-2" *ngFor="let roundListItem of roundListItems" (click)="selectRoundListItem(roundListItem)">
+
+          <div class="d-flex flex-wrap round-icon">
+            <img class="w-50 h-50" [src]="album.imageUrl" alt="" *ngFor="let album of roundListItem.albums">
+          </div>
+
+          <div class="flex-grow-1 px-2">
+
+            <div class="h-100 d-flex flex-column justify-content-between">
+              <div>
+                <h4>Round {{ roundListItem.round.number }}</h4>
+                <div class="d-flex">
+                  <div class="particpant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let member of roundListItem.members">
+                    <p>{{ member.firstName[0] + member.lastName[0] }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <small>{{ roundListItem.round.startDate }} to {{ roundListItem.round.endDate }}</small>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-8 p-2 d-flex flex-column bg-primary" *ngIf="selectedRound !== null">
+
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-2">Round {{ selectedRound.number }}</h1>
+      <button id="edit-round-button" type="button" name="button">
+        <i class="fas fa-edit"></i>
+      </button>
+    </div>
+
+    <div class="d-flex flex-grow-1">
+
+      <!-- Album list -->
+      <div class="list-group mr-2">
+        <div class="album-list-item mb-2" *ngFor="let albumListItem of albumListItems" (click)="selectAlbumListItem(albumListItem)">
+          <img class="album-icon" [src]="albumListItem.imageUrl" alt="">
+        </div>
+      </div>
+
+      <!-- Album info section -->
+      <div class="flex-grow-1 bg-secondary">
+        <div class="" *ngIf="selectedAlbum !== null">
+
+          <div class="d-flex justify-content-between mb-2">
+            <div class="">
+              <h1>{{ selectedAlbum.title }}</h1>
+              <h2>{{ selectedAlbum.artist }}</h2>
+            </div>
+
+            <div class="">
+              <p>Posted by </p>
+            </div>
+          </div>
+
+          <h3>Picked tracks</h3>
+
+
+        </div>
+      </div>
+
+    </div>
+
+
+
+  </div>
+
+</div>
