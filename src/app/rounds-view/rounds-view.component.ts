@@ -23,7 +23,6 @@ interface IAlbumForm {
 })
 export class RoundsViewComponent implements OnInit {
 
-  roundForm: FormGroup;
   albumForm: FormGroup;
 
   albumListItems: IAlbum[];
@@ -52,10 +51,12 @@ export class RoundsViewComponent implements OnInit {
     this.selectedAlbum = null;
   }
 
+  selectRound(newSelectedRound: any): void {
+    this.selectedRound = newSelectedRound;
+  }
+
   selectAlbumListItem(albumListItem: IAlbum): void {
     this.selectedAlbum = albumListItem;
-    //alert(this.selectedAlbum.title);
-    //this.pickedTrackListItems =
   }
 
   async submitAlbumForm(): Promise<void> {

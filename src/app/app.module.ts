@@ -8,13 +8,15 @@ import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { RoundsViewComponent } from './rounds-view/rounds-view.component';
 import { RoundsListComponent } from './rounds-list/rounds-list.component';
+import { RoundInfoComponent } from './round-info/round-info.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
     RoundsViewComponent,
-    RoundsListComponent
+    RoundsListComponent,
+    RoundInfoComponent
   ],
   imports: [
     BrowserModule,

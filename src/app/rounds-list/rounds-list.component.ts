@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 // Import model interfaces
@@ -30,6 +30,9 @@ export class RoundsListComponent implements OnInit {
 
   roundForm: FormGroup;
   roundListItems: any[];
+  selectedRound: IRound;
+
+  @Output() roundSelectEvent = new EventEmitter<IRound>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -44,6 +47,8 @@ export class RoundsListComponent implements OnInit {
       endDate: [null, Validators.required],
       picksPerParticipant: [null, Validators.required]
 		});
+
+    this.selectedRound = null;
 
     this.loadAllRounds();
   }
@@ -70,27 +75,26 @@ export class RoundsListComponent implements OnInit {
     });
   }
 
-  selectRoundListItem(roundListItem: IRoundListItem): void {
-    //this.selectedRound = roundListItem.round;
-    //alert(this.selectedRound.id);
-    //this.albumListItems = roundListItem.albums;
+  selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
+    //alert(selectedRoundListItem.round.id);
+    this.roundSelectEvent.emit(selectedRoundListItem.round);
   }
 
   async submitRoundForm(): Promise<void> {
     const form: IRoundForm = this.roundForm.value as IRoundForm;
 
     // Create the round in the database
-    const round: IRound = await this.roundService.createRound(form).toPromise();
+    const newRound: IRound = await this.roundService.createRound(form).toPromise();
 
     // Create a list item for the round
-    const roundListItem: IRoundListItem = {
-      round: round,
+    const newRoundListItem: IRoundListItem = {
+      round: newRound,
       albums: [],
       members: []
     };
 
     // Add the round list item to the list
-    this.roundListItems.push(roundListItem);
+    this.roundListItems.push(newRoundListItem);
 
     // Sort round list items by descending round number
     this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
