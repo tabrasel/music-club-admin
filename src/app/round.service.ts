@@ -13,7 +13,15 @@ export class RoundService {
 
   constructor(private httpClient: HttpClient) { }
 
+  createRound(roundInfo: any) {
+    return this.httpClient.post<any>(this.hostUrl + 'api/round', roundInfo);
+  }
+
   getRoundbyId(id: string): any {
     return this.httpClient.get<IRound>(this.hostUrl + 'api/round?id=' + id);
+  }
+
+  getAllRounds(): any {
+    return this.httpClient.get<IRound[]>(this.hostUrl + 'api/rounds');
   }
 }
