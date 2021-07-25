@@ -1,0 +1,82 @@
+<!-- Header and add button -->
+<div class="mb-2 d-flex justify-content-between align-items-center">
+  <h1>Rounds</h1>
+  <button id="add-round-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#round-form-modal">
+    <i class="fas fa-plus"></i>
+  </button>
+</div>
+
+<div class="flex-grow-1 position-relative">
+  <div class="h-100 list-group overflow-auto scrollable-list-group">
+
+    <!-- Round list item -->
+    <div class="list-group-item list-group-item-action round-list-item d-flex p-2" *ngFor="let roundListItem of roundListItems" (click)="selectRoundListItem(roundListItem)">
+
+      <!-- Round icon -->
+      <div class="d-flex flex-wrap round-icon">
+        <img class="w-50 h-50" [src]="album.imageUrl" alt="" *ngFor="let album of roundListItem.albums">
+      </div>
+
+      <div class="flex-grow-1 px-2">
+        <div class="h-100 d-flex flex-column justify-content-between">
+          <div>
+            <h4>Round {{ roundListItem.round.number }}</h4>
+            <div class="d-flex">
+              <div class="particpant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let member of roundListItem.members">
+                <p>{{ member.firstName[0] + member.lastName[0] }}</p>
+              </div>
+            </div>
+          </div>
+
+          <small>{{ roundListItem.round.startDate }} to {{ roundListItem.round.endDate }}</small>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div class="modal fade" id="round-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Round Editor</h5>
+      </div>
+
+      <div class="modal-body">
+        <form id="round-form" [formGroup]="roundForm" (ngSubmit)="submitRoundForm()" class="needs-validation">
+          <div class="row mb-3">
+            <div class="col-6 form-group">
+              <label class="form-label">Number</label>
+              <input type="number" formControlName="number" class="form-control form-control-sm" min="1" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">Picks Per Participant</label>
+              <input type="number" formControlName="picksPerParticipant" class="form-control form-control-sm" min="1" required/>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-6 form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" formControlName="startDate" class="form-control form-control-sm" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" formControlName="endDate" class="form-control form-control-sm" required/>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" id="modal-close-button" data-bs-dismiss="modal" (click)="clearRoundForm()">Cancel</button>
+        <button type="submit" form="round-form" class="btn btn-sm btn-primary" [disabled]="!roundForm.valid">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,15 @@
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 h1, p {
   margin: 0px;
+}
+
+.list-group-item {
+  cursor: pointer;
 }
 
 .round-icon {
@@ -30,42 +40,11 @@ h1, p {
   border: none;
 }
 
-.album-icon {
-  width: 148px;
-  height: 148px;
-}
-
-.album-list-item {
-  cursor: pointer;
-}
-
-.list-group-item {
-  cursor: pointer;
-}
-
-.list-group {
-  display: inline-block;
-}
-
-#help {
+.scrollable-list-group {
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
   overflow: auto;
-}
-
-#edit-round-button {
-  width: 36px;
-  height: 36px;
-  border-radius: 5%;
-  border: none;
-}
-
-#add-album-button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
 }

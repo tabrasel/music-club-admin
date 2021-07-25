@@ -1,51 +1,14 @@
 <div class="h-100 row g-0">
 
   <div class="h-100 p-2 col-4 d-flex flex-column">
-
-    <div class="w-100 mb-2 d-flex justify-content-between align-items-center">
-      <h1>Rounds</h1>
-      <button id="add-round-button" type="button" name="button">
-        <i class="fas fa-plus"></i>
-      </button>
-    </div>
-
-    <div class="h-100 flex-grow-1 position-relative">
-      <div class="h-100 list-group overflow-auto" id="help">
-
-        <div class="list-group-item list-group-item-action round-list-item d-flex p-2" *ngFor="let roundListItem of roundListItems" (click)="selectRoundListItem(roundListItem)">
-
-          <div class="d-flex flex-wrap round-icon">
-            <img class="w-50 h-50" [src]="album.imageUrl" alt="" *ngFor="let album of roundListItem.albums">
-          </div>
-
-          <div class="flex-grow-1 px-2">
-
-            <div class="h-100 d-flex flex-column justify-content-between">
-              <div>
-                <h4>Round {{ roundListItem.round.number }}</h4>
-                <div class="d-flex">
-                  <div class="particpant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let member of roundListItem.members">
-                    <p>{{ member.firstName[0] + member.lastName[0] }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <small>{{ roundListItem.round.startDate }} to {{ roundListItem.round.endDate }}</small>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-
+    <app-rounds-list></app-rounds-list>
   </div>
 
-  <div class="col-8 p-2 d-flex flex-column bg-primary" *ngIf="selectedRound !== null">
+  <!--
+  <div class="col-8 p-2 d-flex flex-column" *ngIf="selectedRound !== null">
 
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="mb-2">Round {{ selectedRound.number }}</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1>Round {{ selectedRound.number }}</h1>
       <button id="edit-round-button" type="button" name="button">
         <i class="fas fa-edit"></i>
       </button>
@@ -53,14 +16,25 @@
 
     <div class="d-flex flex-grow-1">
 
-      <!-- Album list -->
-      <div class="list-group mr-2">
-        <div class="album-list-item mb-2" *ngFor="let albumListItem of albumListItems" (click)="selectAlbumListItem(albumListItem)">
-          <img class="album-icon" [src]="albumListItem.imageUrl" alt="">
+
+      <div class="mr-2">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Albums</h2>
+          <button id="add-album-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#album-form-modal">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+
+
+
+        <div class="list-group">
+          <div class="album-list-item mb-2" *ngFor="let albumListItem of albumListItems" (click)="selectAlbumListItem(albumListItem)">
+            <img class="album-icon" [src]="albumListItem.imageUrl" alt="">
+          </div>
         </div>
       </div>
 
-      <!-- Album info section -->
       <div class="flex-grow-1 bg-secondary">
         <div class="" *ngIf="selectedAlbum !== null">
 
@@ -77,14 +51,70 @@
 
           <h3>Picked tracks</h3>
 
-
         </div>
       </div>
 
     </div>
 
-
-
   </div>
+
+</div>
+
+
+<div class="modal fade" id="album-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Album Editor</h5>
+      </div>
+
+      <div class="modal-body">
+        <form id="album-form" [formGroup]="albumForm" (ngSubmit)="submitAlbumForm()" class="needs-validation">
+          <div class="row mb-3">
+            <div class="col-6 form-group">
+              <label class="form-label">Title</label>
+              <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">Artist</label>
+              <input type="text" formControlName="artist" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-6 form-group">
+              <label class="form-label"># Tracks</label>
+              <input type="number" formControlName="trackCount" class="form-control form-control-sm" min="1" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">Image URL</label>
+              <input type="text" formControlName="imageUrl" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6 form-group">
+              <label class="form-label">Poster</label>
+              <input type="text" formControlName="posterName" class="form-control form-control-sm" list="posters" autocomplete="off" required/>
+
+              <datalist id="posters">
+                <option [value]="posterOption" *ngFor="let posterOption of posterOptions">
+              </datalist>
+
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" id="modal-close-button" data-bs-dismiss="modal" (click)="clearAlbumForm()">Cancel</button>
+        <button type="submit" form="album-form" class="btn btn-sm btn-primary" [disabled]="!albumForm.valid">Save</button>
+      </div>
+    </div>
+  </div>
+  -->
 
 </div>
