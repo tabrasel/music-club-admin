@@ -29,7 +29,7 @@ interface IRoundListItem {
 export class RoundsListComponent implements OnInit {
 
   roundForm: FormGroup;
-  roundListItems: any[];
+  roundListItems: IRoundListItem[];
   selectedRound: IRound;
 
   @Output() roundSelectEvent = new EventEmitter<IRound>();
