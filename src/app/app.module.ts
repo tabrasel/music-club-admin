@@ -9,6 +9,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { RoundsViewComponent } from './rounds-view/rounds-view.component';
 import { RoundsListComponent } from './rounds-list/rounds-list.component';
 import { RoundInfoComponent } from './round-info/round-info.component';
+import { RoundAlbumsListComponent } from './round-albums-list/round-albums-list.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { RoundInfoComponent } from './round-info/round-info.component';
     NavbarComponent,
     RoundsViewComponent,
     RoundsListComponent,
-    RoundInfoComponent
+    RoundInfoComponent,
+    RoundAlbumsListComponent
   ],
   imports: [
     BrowserModule,

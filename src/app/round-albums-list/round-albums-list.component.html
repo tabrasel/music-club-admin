@@ -1,0 +1,73 @@
+<!-- Header and add button -->
+<div class="d-flex justify-content-between align-items-center">
+  <h2>Albums</h2>
+  <button id="add-album-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#album-form-modal">
+    <i class="fas fa-plus"></i>
+  </button>
+</div>
+
+<div class="flex-grow-1 list-group">
+  <div class="list-group-item list-group-item-action album-list-item p-2" *ngFor="let albumListItem of albumListItems" (click)="selectAlbumListItem(albumListItem)">
+    <img class="album-icon" [src]="albumListItem.album.imageUrl" alt="">
+
+    <button class="" type="button" name="button">X</button>
+  </div>
+</div>
+
+<!-- Album form modal -->
+<div class="modal fade" id="album-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Album Editor</h5>
+      </div>
+
+      <div class="modal-body">
+        <form id="album-form" [formGroup]="albumForm" (ngSubmit)="submitAlbumForm()" class="needs-validation">
+          <div class="row mb-3">
+            <div class="col-6 form-group">
+              <label class="form-label">Title</label>
+              <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">Artist</label>
+              <input type="text" formControlName="artist" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-6 form-group">
+              <label class="form-label"># Tracks</label>
+              <input type="number" formControlName="trackCount" class="form-control form-control-sm" min="1" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">Image URL</label>
+              <input type="text" formControlName="imageUrl" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6 form-group">
+              <label class="form-label">Poster</label>
+              <input type="text" formControlName="posterName" class="form-control form-control-sm" list="posters" autocomplete="off" required/>
+              <!--
+              <datalist id="posters">
+                <option [value]="posterOption" *ngFor="let posterOption of posterOptions">
+              </datalist>
+              -->
+
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" id="modal-close-button" data-bs-dismiss="modal" (click)="clearAlbumForm()">Cancel</button>
+        <button type="submit" form="album-form" class="btn btn-sm btn-primary" [disabled]="!albumForm.valid">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

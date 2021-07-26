@@ -33,38 +33,16 @@ export class RoundsViewComponent implements OnInit {
   selectedRoundAlbums: IAlbum[];
 
   constructor(
-    private formBuilder: FormBuilder,
     private roundService: RoundService
   ) { }
 
   ngOnInit(): void {
-    // Define the album form
-    this.albumForm = this.formBuilder.group({
-      title: [null, Validators.required],
-      artist: [null, Validators.required],
-      trackCount: [null, Validators.required],
-      imageUrl: [null, Validators.required],
-      posterName: [null, Validators.required]
-    });
-
     this.selectedRound = null;
     this.selectedAlbum = null;
   }
 
   selectRound(newSelectedRound: any): void {
     this.selectedRound = newSelectedRound;
-  }
-
-  selectAlbumListItem(albumListItem: IAlbum): void {
-    this.selectedAlbum = albumListItem;
-  }
-
-  async submitAlbumForm(): Promise<void> {
-    alert('submitted');
-  }
-
-  clearAlbumForm(): void {
-    this.albumForm.reset();
   }
 
 }

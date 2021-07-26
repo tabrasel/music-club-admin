@@ -1,0 +1,25 @@
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#add-album-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+}
+
+.album-icon {
+  min-width: 128px;
+  min-height: 128px;
+  max-width: 128px;
+  max-height: 128px;
+  background-color: lightgray;
+  box-shadow: lightgray 0px 0px 5px;
+}
+
+.list-group-item {
+  cursor: pointer;
+}
