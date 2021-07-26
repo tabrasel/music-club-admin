@@ -23,14 +23,7 @@ interface IAlbumForm {
 })
 export class RoundsViewComponent implements OnInit {
 
-  albumForm: FormGroup;
-
-  albumListItems: IAlbum[];
-
   selectedRound: IRound;
-  selectedAlbum: IAlbum;
-
-  selectedRoundAlbums: IAlbum[];
 
   constructor(
     private roundService: RoundService
@@ -38,7 +31,6 @@ export class RoundsViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedRound = null;
-    this.selectedAlbum = null;
   }
 
   selectRound(newSelectedRound: any): void {
