@@ -6,6 +6,7 @@ import { IAlbum } from '../interfaces/IAlbum';
 import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
+import { AlbumService } from '../album.service';
 import { RoundService } from '../round.service';
 
 interface IRoundForm {
@@ -36,6 +37,7 @@ export class RoundsListComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
+    private albumService: AlbumService,
     private roundService: RoundService
   ) { }
 
@@ -53,26 +55,34 @@ export class RoundsListComponent implements OnInit {
     this.loadAllRounds();
   }
 
-  loadAllRounds(): void {
+  async loadAllRounds(): Promise<void> {
     // Clear list of round list items
     this.roundListItems = [];
 
-    this.roundService.getAllRounds().subscribe(rounds => {
-      for (let round of rounds) {
-        // TODO: sync load the albums and members of the round
+    const rounds = await this.roundService.getAllRounds().toPromise();
 
-        const roundListItem: IRoundListItem = {
-          round: round,
-          albums: [],
-          members: []
-        };
-
-        this.roundListItems.push(roundListItem);
+    for (let round of rounds) {
+      // Load the albums in the round
+      const roundAlbums: IAlbum[] = [];
+      for (let roundAlbumId of round.albumIds) {
+        const roundAlbum: IAlbum = await this.albumService.getAlbumById(roundAlbumId).toPromise();
+        roundAlbums.push(roundAlbum);
       }
 
-      // Sort round list items by descending round number
-      this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
-    });
+      // TODO: load members of the round
+
+      const roundListItem: IRoundListItem = {
+        round: round,
+        albums: roundAlbums,
+        members: []
+      };
+
+      this.roundListItems.push(roundListItem);
+    }
+
+    // Sort round list items by descending round number
+    this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
+
   }
 
   selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
