@@ -7,15 +7,11 @@
   <div class="h-100 flex-grow-1">
     <div class="h-100 d-flex">
       <div class="h-100 mr-3">
-        <app-round-albums-list [round]="round"></app-round-albums-list>
+        <app-round-albums-list [round]="round" (albumSelectEvent)="selectAlbum($event)"></app-round-albums-list>
       </div>
 
-      <div class="h-100 flex-grow-1 bg-primary">
-        <div class="" *ngIf="selectedAlbum !== null">
-          <h2>[Title]</h2>
-          <h3>[Artist]</h3>
-          <p>Picked Tracks (of 8)</p>
-        </div>
+      <div class="h-100 flex-grow-1">
+        <app-album-info [album]="selectedAlbum" *ngIf="selectedAlbum !== null"></app-album-info>
       </div>
     </div>
   </div>

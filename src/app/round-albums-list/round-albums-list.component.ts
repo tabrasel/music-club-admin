@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 // Import model interfaces
@@ -29,9 +29,10 @@ export class RoundAlbumsListComponent implements OnInit {
 
   albumForm: FormGroup;
   albumListItems: IAlbumListItem[];
-  selectedAlbum: IAlbum;
 
   @Input() round: IRound;
+
+  @Output() albumSelectEvent = new EventEmitter<IAlbum>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -71,8 +72,8 @@ export class RoundAlbumsListComponent implements OnInit {
     }
   }
 
-  selectAlbumListItem(albumListItem: IAlbum): void {
-    this.selectedAlbum = albumListItem;
+  selectAlbumListItem(albumListItem: IAlbumListItem): void {
+    this.albumSelectEvent.emit(albumListItem.album);
   }
 
   async submitAlbumForm(): Promise<void> {

@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
+import { IAlbum } from '../interfaces/IAlbum';
 import { IRound } from '../interfaces/IRound';
 
 @Component({
@@ -9,11 +10,24 @@ import { IRound } from '../interfaces/IRound';
 })
 export class RoundInfoComponent implements OnInit {
 
+  selectedAlbum: IAlbum;
+
   @Input() round: IRound;
 
   constructor() { }
 
   ngOnInit(): void {
+    this.selectedAlbum = null;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('round' in changes) {
+      this.selectedAlbum = null;
+    }
+  }
+
+  selectAlbum(newSelectedAlbum: any): void {
+    this.selectedAlbum = newSelectedAlbum;
   }
 
 }
