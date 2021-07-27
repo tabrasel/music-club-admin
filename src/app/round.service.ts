@@ -17,6 +17,10 @@ export class RoundService {
     return this.httpClient.post<any>(this.hostUrl + 'api/round', roundInfo);
   }
 
+  updateRound(id: string, updatedData: any): any {
+    return this.httpClient.put<any>(this.hostUrl + 'api/round?id=' + id, updatedData);
+  }
+
   getRoundbyId(id: string): any {
     return this.httpClient.get<IRound>(this.hostUrl + 'api/round?id=' + id);
   }

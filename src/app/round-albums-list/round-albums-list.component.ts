@@ -7,6 +7,7 @@ import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
 import { AlbumService } from '../album.service';
+import { RoundService } from '../round.service';
 
 interface IAlbumForm {
   title: string;
@@ -36,7 +37,8 @@ export class RoundAlbumsListComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private albumService: AlbumService
+    private albumService: AlbumService,
+    private roundService: RoundService
   ) { }
 
   ngOnInit(): void {
@@ -82,7 +84,11 @@ export class RoundAlbumsListComponent implements OnInit {
     // Create the album in the database
     const newAlbum: IAlbum = await this.albumService.createAlbum(form).toPromise();
 
-    // TODO: Add album to the selected round
+    // Add album to the selected round
+    this.round.albumIds.push(newAlbum.id);
+    await this.roundService.updateRound(this.round.id, { albumIds: this.round.albumIds }).toPromise();
+
+    // TODO: Update round list item icon to include album image
 
     // Create a list item for the album
     const newAlbumListItem: IAlbumListItem = {
