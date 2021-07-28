@@ -1,0 +1,7 @@
+:host {
+  height: 100%;
+}
+
+.picked-track-list-item h5 {
+  margin: 0px;
+}

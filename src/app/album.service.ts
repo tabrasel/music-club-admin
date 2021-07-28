@@ -17,6 +17,10 @@ export class AlbumService {
     return this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo);
   }
 
+  updateAlbum(id: string, updatedData: any): any {
+    return this.httpClient.put<any>(this.hostUrl + 'api/album?id=' + id, updatedData);
+  }
+
   getAlbumById(id: string): any {
     return this.httpClient.get<IAlbum>(this.hostUrl + 'api/album?id=' + id);
   }
