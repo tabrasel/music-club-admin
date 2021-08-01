@@ -30,6 +30,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
   albumForm: FormGroup;
   albumListItems: IAlbumListItem[];
+  selectedAlbum: IAlbum;
 
   @Input() round: IRound;
 
@@ -56,6 +57,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('round' in changes) {
+      this.selectedAlbum = null;
       this.loadAlbumListItems();
     }
   }
@@ -75,18 +77,15 @@ export class RoundAlbumsListComponent implements OnInit {
   }
 
   selectAlbumListItem(albumListItem: IAlbumListItem): void {
+    this.selectedAlbum = albumListItem.album;
     this.albumSelectEvent.emit(albumListItem.album);
   }
 
   async submitAlbumForm(): Promise<void> {
     const form: IAlbumForm = this.albumForm.value as IAlbumForm;
 
-    // Create the album in the database
-    const newAlbum: IAlbum = await this.albumService.createAlbum(form).toPromise();
-
-    // Add album to the selected round
-    this.round.albumIds.push(newAlbum.id);
-    await this.roundService.updateRound(this.round.id, { albumIds: this.round.albumIds }).toPromise();
+    // Create the album
+    const newAlbum: IAlbum = await this.albumService.createAlbum(form, this.round);
 
     // TODO: Update round list item icon to include album image
 
@@ -102,7 +101,7 @@ export class RoundAlbumsListComponent implements OnInit {
     //this.albumListItems = this.albumListItems.sort((a, b) => a.album.title > b.round.number ? -1 : 1);
 
     // Close the album form modal
-    document.getElementById('modal-close-button').click();
+    document.getElementById('album-modal-close-button').click();
   }
 
   clearAlbumForm(): void {
