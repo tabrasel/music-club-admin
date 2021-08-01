@@ -17,7 +17,7 @@
         <!-- Album icon -->
         <img class="mr-2 album-icon" [src]="albumListItem.album.imageUrl" alt="">
 
-        <button class="btn btn-danger" type="button" name="button">
+        <button class="btn btn-danger" type="button" name="button" (click)="deleteAlbum(albumListItem.album)">
           <i class="fas fa-times"></i>
         </button>
 

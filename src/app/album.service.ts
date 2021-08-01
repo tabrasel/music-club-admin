@@ -34,6 +34,22 @@ export class AlbumService {
     return this.httpClient.put<any>(this.hostUrl + 'api/album?id=' + id, updatedData);
   }
 
+  async deleteAlbum(deletedAlbum: IAlbum, round: IRound) {
+    // Remove the album from it's round
+    round.albumIds = round.albumIds.filter(albumId => albumId != deletedAlbum.id);
+    await this.roundService.updateRound(round.id, { albumIds: round.albumIds }).toPromise();
+
+    // TODO: Remove the album from it's poster's posted albums
+
+    // TODO: Delete the album's poster from the database if it was the only post they made
+
+    // Delete the album from the database
+    alert('deleting with ' + this.hostUrl + 'api/album?id=' + deletedAlbum.id);
+    await this.httpClient.delete<any>(this.hostUrl + 'api/album?id=' + deletedAlbum.id).toPromise();
+
+    return deletedAlbum;
+  }
+
   getAlbumById(id: string): any {
     return this.httpClient.get<IAlbum>(this.hostUrl + 'api/album?id=' + id);
   }

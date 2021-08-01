@@ -104,6 +104,17 @@ export class RoundAlbumsListComponent implements OnInit {
     document.getElementById('album-modal-close-button').click();
   }
 
+  async deleteAlbum(deletedAlbum: IAlbum): Promise<void> {
+    // Don't click any elements under the delete button
+    event.stopPropagation();
+
+    // TODO: Delete the album from the database
+    const foo = await this.albumService.deleteAlbum(deletedAlbum, this.round);
+
+    // Remove the album's list item
+    this.albumListItems = this.albumListItems.filter(albumListItem => albumListItem.album.id != deletedAlbum.id);
+  }
+
   clearAlbumForm(): void {
     this.albumForm.reset();
   }
