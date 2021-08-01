@@ -1,16 +1,22 @@
-<div class="h-100 p-3 d-flex flex-column" *ngIf="round !== null">
+<div class="h-100 d-flex flex-column" *ngIf="round !== null">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <header class="p-2 d-flex justify-content-between align-items-center">
     <h1>Round {{ round.number }}</h1>
-  </div>
+    <div class="">
+      <p>From {{ round.startDate }} to {{ round.endDate }}</p>
+      <div class="d-flex">
+        <p *ngFor="let p of round.albumIds">Icon</p>
+      </div>
+    </div>
+  </header>
 
   <div class="h-100 flex-grow-1">
-    <div class="h-100 d-flex">
-      <div class="h-100 mr-3">
+    <div class="h-100 row g-0">
+      <div class="col-3 h-100">
         <app-round-albums-list [round]="round" (albumSelectEvent)="selectAlbum($event)"></app-round-albums-list>
       </div>
 
-      <div class="h-100 flex-grow-1">
+      <div class="col-9 h-100">
         <app-album-info [album]="selectedAlbum" *ngIf="selectedAlbum !== null"></app-album-info>
       </div>
     </div>
