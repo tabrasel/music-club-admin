@@ -1,17 +1,31 @@
-<!-- Header and add button -->
-<div class="d-flex justify-content-between align-items-center">
-  <h2>Albums</h2>
-  <button id="add-album-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#album-form-modal">
-    <i class="fas fa-plus"></i>
-  </button>
-</div>
+<div class="h-100 p-3 d-flex flex-column">
 
-<div class="flex-grow-1 list-group">
-  <div class="list-group-item list-group-item-action album-list-item p-2" *ngFor="let albumListItem of albumListItems" (click)="selectAlbumListItem(albumListItem)">
-    <img class="album-icon" [src]="albumListItem.album.imageUrl" alt="">
-
-    <button class="" type="button" name="button">X</button>
+  <!-- Header and add button -->
+  <div class="mb-2 d-flex justify-content-between align-items-center">
+    <h2 class="m-0">Albums</h2>
+    <button id="add-album-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#album-form-modal">
+      <i class="fas fa-plus"></i>
+    </button>
   </div>
+
+  <div class="flex-grow-1 position-relative">
+    <div class="h-100 p-2 list-group scrollable-list-group">
+
+      <!-- Album list item -->
+      <div class="list-group-item list-group-item-action album-list-item p-2 d-flex justify-content-between align-items-start" [class.active]="selectedAlbum != null && albumListItem.album.id === selectedAlbum.id" *ngFor="let albumListItem of albumListItems" (click)="selectAlbumListItem(albumListItem)">
+
+        <!-- Album icon -->
+        <img class="mr-2 album-icon" [src]="albumListItem.album.imageUrl" alt="">
+
+        <button class="btn btn-danger" type="button" name="button">
+          <i class="fas fa-times"></i>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <!-- Album form modal -->

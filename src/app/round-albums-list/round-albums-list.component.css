@@ -1,7 +1,5 @@
 :host {
   height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 #add-album-button {
@@ -9,6 +7,30 @@
   height: 32px;
   border-radius: 50%;
   border: none;
+  background-color: #212529;
+  color: white;
+}
+
+.scrollable-list-group {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+  background-color: whitesmoke;
+}
+
+.list-group-item {
+  cursor: pointer;
+}
+
+.list-group-item.active {
+  /*
+  color: #000000;
+  background-color: #eeeeee;
+  border-color: #eeeeee;
+  */
 }
 
 .album-icon {
@@ -17,9 +39,5 @@
   max-width: 128px;
   max-height: 128px;
   background-color: lightgray;
-  box-shadow: lightgray 0px 0px 5px;
-}
-
-.list-group-item {
-  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px;
 }
