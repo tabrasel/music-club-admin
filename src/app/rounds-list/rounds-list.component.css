@@ -3,24 +3,54 @@
   display: flex;
   flex-direction: column;
   box-shadow: lightgray 0px 0px 10px;
-  z-index: 50
+}
+
+#foo {
+  z-index: 100;
 }
 
 h1, p {
   margin: 0px;
 }
 
+#add-round-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #212529;
+  color: white;
+}
+
+.scrollable-list-group {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+  background-color: whitesmoke;
+}
+
 .list-group-item {
   cursor: pointer;
 }
 
+.list-group-item.active {
+  /*
+  color: #000000;
+  background-color: #eeeeee;
+  border-color: #eeeeee;
+  */
+}
+
 .round-icon {
-  min-width: 128px;
-  min-height: 128px;
-  max-width: 128px;
-  max-height: 128px;
+  min-width: 100px;
+  min-height: 100px;
+  max-width: 100px;
+  max-height: 100px;
   background-color: lightgray;
-  box-shadow: lightgray 0px 0px 5px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px;
 }
 
 .particpant-icon {
@@ -33,20 +63,4 @@ h1, p {
   display: inline-block;
   border: 1px solid black;
   border-radius: 50%;
-}
-
-#add-round-button {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: none;
-}
-
-.scrollable-list-group {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  overflow: auto;
 }

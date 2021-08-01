@@ -87,6 +87,7 @@ export class RoundsListComponent implements OnInit {
 
   selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
     //alert(selectedRoundListItem.round.id);
+    this.selectedRound = selectedRoundListItem.round;
     this.roundSelectEvent.emit(selectedRoundListItem.round);
   }
 
