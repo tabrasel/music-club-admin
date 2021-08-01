@@ -2,6 +2,29 @@
   height: 100%;
 }
 
-.picked-track-list-item h5 {
+#foo {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 15px;
+  /*background-color: green;*/
+}
+
+.picked-track-list-item p {
   margin: 0px;
+}
+
+h3 {
+  font-style: italic;
+}
+
+.scrollable-list-group {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+  background-color: whitesmoke;
+}
+
+.list-group-item {
+  cursor: pointer;
 }
