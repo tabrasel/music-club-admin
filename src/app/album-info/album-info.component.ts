@@ -19,6 +19,7 @@ interface IPickedTrackListItem {
 interface IPickedTrackForm {
   title: string;
   trackNumber: number;
+  isTopTrack: boolean;
   pickerIds: string[];
 }
 
@@ -44,6 +45,7 @@ export class AlbumInfoComponent implements OnInit {
     this.pickedTrackForm = this.formBuilder.group({
       title: [null, Validators.required],
       trackNumber: [null, Validators.required],
+      isTopTrack: [null],
       pickerIds: [null]
     });
 
@@ -84,9 +86,20 @@ export class AlbumInfoComponent implements OnInit {
       pickerIds: form.pickerIds
     };
 
+    // Update the picked track's album
+
+    const newAlbumData = {};
+
     // Add picked track to the selected album
     this.album.pickedTracks.push(newPickedTrack);
-    await this.albumService.updateAlbum(this.album.id, { pickedTracks: this.album.pickedTracks }).toPromise();
+    newAlbumData['pickedTracks'] = this.album.pickedTracks;
+
+    // Set picked track as top track in its album if it's selected
+    if (form.isTopTrack && form.trackNumber !== this.album.topTrackNumber) {
+      newAlbumData['topTrackNumber'] = form.trackNumber;
+    }
+
+    await this.albumService.updateAlbum(this.album.id, newAlbumData).toPromise();
 
     // Create a list item for the picked track
     const newPickedTrackListItem: IPickedTrackListItem = {
