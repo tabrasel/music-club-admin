@@ -101,7 +101,7 @@ export class AlbumInfoComponent implements OnInit {
     this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
 
     // Close the picked track form modal
-    document.getElementById('modal-close-button').click();
+    document.getElementById('picked-track-modal-close-button').click();
   }
 
   clearPickedTrackForm(): void {

@@ -110,7 +110,7 @@ export class RoundsListComponent implements OnInit {
     this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
 
     // Close the round form modal
-    document.getElementById('modal-close-button').click();
+    document.getElementById('round-modal-close-button').click();
   }
 
   clearRoundForm(): void {

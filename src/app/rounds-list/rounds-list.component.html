@@ -48,6 +48,7 @@
       <div class="modal-body">
         <form id="round-form" [formGroup]="roundForm" (ngSubmit)="submitRoundForm()" class="needs-validation">
           <div class="row mb-3">
+
             <div class="col-6 form-group">
               <label class="form-label">Number</label>
               <input type="number" formControlName="number" class="form-control form-control-sm" min="1" required/>
@@ -70,11 +71,12 @@
               <input type="date" formControlName="endDate" class="form-control form-control-sm" required/>
             </div>
           </div>
+
         </form>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-sm btn-secondary" id="modal-close-button" data-bs-dismiss="modal" (click)="clearRoundForm()">Cancel</button>
+        <button type="button" class="btn btn-sm btn-secondary" id="round-modal-close-button" data-bs-dismiss="modal" (click)="clearRoundForm()">Cancel</button>
         <button type="submit" form="round-form" class="btn btn-sm btn-primary" [disabled]="!roundForm.valid">Save</button>
       </div>
     </div>
