@@ -2,8 +2,10 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AlbumService } from '../album.service';
+import { MemberService } from '../member.service';
 
 import { IAlbum } from '../interfaces/IAlbum';
+import { IMember } from '../interfaces/IMember';
 
 interface IPickedTrack {
   title: string;
@@ -13,7 +15,7 @@ interface IPickedTrack {
 
 interface IPickedTrackListItem {
   pickedTrack: any,
-  pickerNicknames: string[]
+  pickers: IMember[]
 }
 
 interface IPickedTrackForm {
@@ -32,12 +34,14 @@ export class AlbumInfoComponent implements OnInit {
 
   pickedTrackForm: FormGroup;
   pickedTrackListItems: any[];
+  poster: IMember;
 
   @Input() album: IAlbum;
 
   constructor(
     private formBuilder: FormBuilder,
-    private albumService: AlbumService
+    private albumService: AlbumService,
+    private memberService: MemberService
   ) { }
 
   ngOnInit(): void {
@@ -54,6 +58,11 @@ export class AlbumInfoComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.loadPickedTrackListItems();
+
+    this.memberService.getMemberById(this.album.posterId).subscribe(poster => {
+      alert(poster.firstName)
+      this.poster = poster;
+    });
   }
 
   loadPickedTrackListItems(): void {
@@ -63,11 +72,11 @@ export class AlbumInfoComponent implements OnInit {
     this.pickedTrackListItems = [];
 
     for (let pickedTrack of this.album.pickedTracks) {
-      // TODO: Load picker nicknames from picker ids
+      // TODO: Load pickers from picker ids
 
       const pickedTrackListItem: IPickedTrackListItem = {
         pickedTrack: pickedTrack,
-        pickerNicknames: []
+        pickers: []
       };
       this.pickedTrackListItems.push(pickedTrackListItem);
     }
@@ -104,7 +113,7 @@ export class AlbumInfoComponent implements OnInit {
     // Create a list item for the picked track
     const newPickedTrackListItem: IPickedTrackListItem = {
       pickedTrack: newPickedTrack,
-      pickerNicknames: []
+      pickers: []
     };
 
     // Add the picked track list item to the list

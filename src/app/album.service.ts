@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { IAlbum } from './interfaces/IAlbum';
+import { IMember } from './interfaces/IMember';
 import { IRound } from './interfaces/IRound';
 
+import { MemberService } from './member.service';
 import { RoundService } from './round.service';
 
 @Injectable({
@@ -16,12 +18,27 @@ export class AlbumService {
 
   constructor(
     private httpClient: HttpClient,
+    private memberService: MemberService,
     private roundService: RoundService
   ) { }
 
   async createAlbum(albumInfo: any, round: IRound) {
     // Create new album in database
     const newAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
+
+    // Create new poster if the poster name doesn't exist in the database
+    const posterName: string = albumInfo.posterName;
+    const posterFirstName: string = posterName.split(' ')[0].trim();
+    const posterLastName: string = posterName.split(' ')[1].trim();
+    let poster: IMember = await this.memberService.getMemberByName(posterFirstName, posterLastName).toPromise();
+
+    if (poster === null) {
+      poster = await this.memberService.createMember(posterFirstName, posterLastName).toPromise();
+    }
+
+    // TODO: Add album to poster's list of posted albums
+    poster.postedAlbumIds.push(newAlbum.id);
+    await this.memberService.updateMember(poster.id, { postedAlbumIds: poster.postedAlbumIds }).toPromise();
 
     // Add new album to its round
     round.albumIds.push(newAlbum.id);
