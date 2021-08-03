@@ -17,7 +17,7 @@
     <div class="flex-grow-1 position-relative">
       <div class="h-100 p-2 list-group scrollable-list-group">
 
-        <div class="list-group-item list-group-item-action d-flex picked-track-list-item" *ngFor="let pickedTrackListItem of pickedTrackListItems">
+        <div class="list-group-item list-group-item-action d-flex picked-track-list-item" [class.top-track]="album.topTrackNumber !== null && album.topTrackNumber === pickedTrackListItem.pickedTrack.trackNumber" *ngFor="let pickedTrackListItem of pickedTrackListItems">
           <p>{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
         </div>
 
