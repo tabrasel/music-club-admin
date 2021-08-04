@@ -17,8 +17,25 @@
     <div class="flex-grow-1 position-relative">
       <div class="h-100 p-2 list-group scrollable-list-group">
 
-        <div class="list-group-item list-group-item-action d-flex picked-track-list-item" [class.top-track]="album.topTrackNumber !== null && album.topTrackNumber === pickedTrackListItem.pickedTrack.trackNumber" *ngFor="let pickedTrackListItem of pickedTrackListItems">
+        <div class="position-relative list-group-item picked-track-list-item" [class.top-track]="album.topTrackNumber !== null && album.topTrackNumber === pickedTrackListItem.pickedTrack.trackNumber" *ngFor="let pickedTrackListItem of pickedTrackListItems">
+
           <p>{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
+
+          <div class="picked-track-list-item-overlay">
+            <div class="hover-panel p-1">
+              <!-- Edit button -->
+              <button class="btn btn-secondary hover-panel-button mr-1" type="button" name="button">
+                <i class="fas fa-edit"></i>
+              </button>
+
+              <!-- Delete button -->
+              <button class="btn btn-danger hover-panel-button" type="button" name="button" (click)="deletePickedTrack(pickedTrackListItem.pickedTrack)">
+                <i class="fas fa-times"></i>
+              </button>
+
+            </div>
+          </div>
+
         </div>
 
       </div>

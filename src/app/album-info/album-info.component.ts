@@ -88,6 +88,10 @@ export class AlbumInfoComponent implements OnInit {
   async submitPickedTrackForm(): Promise<void> {
     const form: IPickedTrackForm = this.pickedTrackForm.value as IPickedTrackForm;
 
+    // TODO: search album in database to see if there was already a picked track with the same track number. This will
+    // ensure that the track number can be used as a unique ID (helpful for deletion). Maybe also warn if there is a
+    // picked track with the same name.
+
     // Create the picked track in the database
     const newPickedTrack: IPickedTrack = {
       title: form.title,
@@ -128,6 +132,15 @@ export class AlbumInfoComponent implements OnInit {
 
   clearPickedTrackForm(): void {
     this.pickedTrackForm.reset();
+  }
+
+  deletePickedTrack(deletedPickedTrack: IPickedTrack) {
+    // TODO: Delete the picked track from its album in the database
+    //const foo = await this.albumService.deleteAlbum(deletedAlbum, this.round);
+
+    // Remove the picked track's list item
+    // TODO: Either needs a better unique identifier, or
+    this.pickedTrackListItems = this.pickedTrackListItems.filter(pickedTrackListItem => pickedTrackListItem.pickedTrack.trackNumber != deletedPickedTrack.trackNumber);
   }
 
 }

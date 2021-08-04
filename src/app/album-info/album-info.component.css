@@ -29,6 +29,36 @@ h3 {
   cursor: pointer;
 }
 
+.picked-track-list-item-overlay {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.hover-panel {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.picked-track-list-item-overlay:hover .hover-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.hover-panel-button {
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
+  padding: 0px;
+  color: white;
+}
+
 .top-track {
   background-color: lemonchiffon;
 }
