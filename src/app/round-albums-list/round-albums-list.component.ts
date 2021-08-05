@@ -7,6 +7,7 @@ import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
 import { AlbumService } from '../album.service';
+import { MemberService } from '../member.service';
 import { RoundService } from '../round.service';
 
 interface IAlbumForm {
@@ -18,7 +19,8 @@ interface IAlbumForm {
 }
 
 interface IAlbumListItem {
-  album: IAlbum
+  album: IAlbum,
+  poster: IMember
 }
 
 @Component({
@@ -39,6 +41,7 @@ export class RoundAlbumsListComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private albumService: AlbumService,
+    private memberService: MemberService,
     private roundService: RoundService
   ) { }
 
@@ -66,14 +69,35 @@ export class RoundAlbumsListComponent implements OnInit {
     this.albumListItems = [];
 
     for (let albumId of this.round.albumIds) {
-      const loadedAlbum: IAlbum = await this.albumService.getAlbumById(albumId).toPromise();
-
-      const loadedAlbumListItem: IAlbumListItem = {
-        album: loadedAlbum
-      };
-
-      this.albumListItems.push(loadedAlbumListItem);
+      const album: IAlbum = await this.albumService.getAlbumById(albumId).toPromise();
+      const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
+      this.albumListItems.push(albumListItem);
     }
+
+    // Sort album list items by poster name
+    this.albumListItems = this.albumListItems.sort((a, b) => {
+      if (a.poster.lastName < b.poster.lastName)
+        return -1;
+      else if (a.poster.lastName > b.poster.lastName)
+        return 1;
+        
+      return a.poster.firstName < b.poster.firstName ? -1 : 1;
+    });
+  }
+
+  async createAlbumListItem(album: IAlbum): Promise<IAlbumListItem> {
+    // Get the album's poster
+    const poster: IMember = await this.memberService.getMemberById(album.posterId).toPromise();
+
+    // TODO: Update round list item icon to include album image
+
+    // Create the album list item
+    const albumListItem: IAlbumListItem = {
+      album: album,
+      poster: poster
+    };
+
+    return albumListItem;
   }
 
   selectAlbumListItem(albumListItem: IAlbumListItem): void {
@@ -85,20 +109,16 @@ export class RoundAlbumsListComponent implements OnInit {
     const form: IAlbumForm = this.albumForm.value as IAlbumForm;
 
     // Create the album
-    const newAlbum: IAlbum = await this.albumService.createAlbum(form, this.round);
+    const album: IAlbum = await this.albumService.createAlbum(form, this.round);
 
-    // TODO: Update round list item icon to include album image
-
-    // Create a list item for the album
-    const newAlbumListItem: IAlbumListItem = {
-      album: newAlbum
-    };
+    // Create the album list item
+    const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
 
     // Add the album list item to the list
-    this.albumListItems.push(newAlbumListItem);
+    this.albumListItems.push(albumListItem);
 
     // Sort album list items by title
-    //this.albumListItems = this.albumListItems.sort((a, b) => a.album.title > b.round.number ? -1 : 1);
+    this.albumListItems = this.albumListItems.sort((a, b) => a.poster.lastName > b.poster.lastName ? -1 : 1);
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
