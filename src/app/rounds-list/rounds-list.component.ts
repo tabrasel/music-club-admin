@@ -8,6 +8,7 @@ import { IRound } from '../interfaces/IRound';
 
 import { AlbumService } from '../album.service';
 import { RoundService } from '../round.service';
+import { RoundViewService } from '../round-view.service'
 
 interface IRoundForm {
   number: number;
@@ -38,7 +39,8 @@ export class RoundsListComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private albumService: AlbumService,
-    private roundService: RoundService
+    private roundService: RoundService,
+    private roundViewService: RoundViewService
   ) { }
 
   ngOnInit(): void {
@@ -52,41 +54,12 @@ export class RoundsListComponent implements OnInit {
 
     this.selectedRound = null;
 
-    this.loadAllRounds();
-  }
-
-  async loadAllRounds(): Promise<void> {
-    // Clear list of round list items
-    this.roundListItems = [];
-
-    const rounds = await this.roundService.getAllRounds().toPromise();
-
-    for (let round of rounds) {
-      // Load the albums in the round
-      const roundAlbums: IAlbum[] = [];
-      for (let roundAlbumId of round.albumIds) {
-        const roundAlbum: IAlbum = await this.albumService.getAlbumById(roundAlbumId).toPromise();
-        roundAlbums.push(roundAlbum);
-      }
-
-      // TODO: load members of the round
-
-      const roundListItem: IRoundListItem = {
-        round: round,
-        albums: roundAlbums,
-        members: []
-      };
-
-      this.roundListItems.push(roundListItem);
-    }
-
-    // Sort round list items by descending round number
-    this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
-
+    this.roundViewService.roundListItemsChange.subscribe(roundListItems => {
+      this.roundListItems =  roundListItems;
+    });
   }
 
   selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
-    //alert(selectedRoundListItem.round.id);
     this.selectedRound = selectedRoundListItem.round;
     this.roundSelectEvent.emit(selectedRoundListItem.round);
   }
