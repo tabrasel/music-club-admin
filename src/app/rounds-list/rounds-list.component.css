@@ -58,9 +58,10 @@ h1, p {
 }
 
 .particpant-icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: inline-block;
+  font-size: 12px;
   border: 1px solid black;
   border-radius: 50%;
 }
