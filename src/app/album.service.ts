@@ -23,18 +23,21 @@ export class AlbumService {
   ) { }
 
   async createAlbum(albumInfo: any, round: IRound) {
-    // Create new album in database
-    const newAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
-
     // Create new poster if the poster name doesn't exist in the database
-    const posterName: string = albumInfo.posterName;
-    const posterFirstName: string = posterName.split(' ')[0].trim();
-    const posterLastName: string = posterName.split(' ')[1].trim();
+    const posterFirstName: string = albumInfo.posterName.split(' ')[0].trim();
+    const posterLastName: string = albumInfo.posterName.split(' ')[1].trim();
     let poster: IMember = await this.memberService.getMemberByName(posterFirstName, posterLastName).toPromise();
 
+    // If this is a new poster, create them as a member in the database
     if (poster === null) {
       poster = await this.memberService.createMember(posterFirstName, posterLastName).toPromise();
     }
+
+    // Add the poster ID to the album info
+    albumInfo['posterId'] = poster.id;
+
+    // Create new album in database
+    const newAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
 
     // TODO: Add album to poster's list of posted albums
     poster.postedAlbumIds.push(newAlbum.id);

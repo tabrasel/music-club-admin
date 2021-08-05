@@ -60,7 +60,6 @@ export class AlbumInfoComponent implements OnInit {
     this.loadPickedTrackListItems();
 
     this.memberService.getMemberById(this.album.posterId).subscribe(poster => {
-      alert(poster.firstName)
       this.poster = poster;
     });
   }

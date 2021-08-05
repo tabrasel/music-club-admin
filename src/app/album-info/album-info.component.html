@@ -2,13 +2,21 @@
 
   <div class="h-100 p-3 d-flex flex-column border rounded" id="foo">
 
-    <div class="mb-3">
-      <h3>{{ album.title }}</h3>
-      <h4>{{ album.artist }}</h4>
-    </div>
+    <header class="mb-3 d-flex justify-content-between">
+
+      <div>
+        <h3>{{ album.title }}</h3>
+        <h4>{{ album.artist }}</h4>
+      </div>
+
+      <div>
+        <small *ngIf="poster !== null">Posted by {{ poster.firstName }} {{ poster.lastName }}</small>
+      </div>
+
+    </header>
 
     <div class="mb-2 d-flex justify-content-between align-items-center">
-      <h5>Picked Tracks (of {{ album.trackCount }})</h5>
+      <h5 class="m-0">Picked Tracks (of {{ album.trackCount }})</h5>
       <button id="add-album-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
         <i class="fas fa-plus"></i>
       </button>
