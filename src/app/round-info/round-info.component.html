@@ -1,19 +1,24 @@
 <div class="h-100 d-flex flex-column" *ngIf="round !== null">
 
   <header class="p-2 d-flex justify-content-between align-items-center">
+
     <h1>Round {{ round.number }}</h1>
+
     <div class="d-flex">
-      <div class="d-flex mr-3">
-        <p *ngFor="let p of round.albumIds">Icon</p>
+
+      <div class="d-flex align-items-center mr-3">
+        <div class="particpant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let participant of participants">
+          <p *ngIf="participant !== null">{{ participant.firstName[0] + participant.lastName[0] }}</p>
+        </div>
       </div>
 
-      <div class="">
+      <div>
         <p>Started: {{ round.startDate }}</p>
         <p>Ended: {{ round.endDate }}</p>
       </div>
 
-
     </div>
+
   </header>
 
   <div class="h-100 flex-grow-1">

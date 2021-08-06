@@ -5,3 +5,12 @@ header {
 p {
   margin: 0px;
 }
+
+.particpant-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 50%;
+}
