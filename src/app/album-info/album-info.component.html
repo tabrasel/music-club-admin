@@ -10,7 +10,7 @@
       </div>
 
       <div>
-        <small *ngIf="poster !== null">Posted by {{ poster.firstName }} {{ poster.lastName }}</small>
+        <small *ngIf="poster !== null && poster !== undefined">Posted by {{ poster.firstName }} {{ poster.lastName }}</small>
       </div>
 
     </header>
