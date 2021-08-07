@@ -40,6 +40,8 @@ export class RoundInfoComponent implements OnInit {
   }
 
   async loadParticipants(): Promise<void> {
+    if (this.round === null) return;
+    
     this.participants = [];
     for (let albumId of this.round.albumIds) {
       const album: IAlbum = await this.albumService.getAlbumById(albumId).toPromise();
