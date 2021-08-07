@@ -80,7 +80,6 @@ export class RoundAlbumsListComponent implements OnInit {
         return -1;
       else if (a.poster.lastName > b.poster.lastName)
         return 1;
-        
       return a.poster.firstName < b.poster.firstName ? -1 : 1;
     });
   }
@@ -127,6 +126,8 @@ export class RoundAlbumsListComponent implements OnInit {
   async deleteAlbum(deletedAlbum: IAlbum): Promise<void> {
     // Don't click any elements under the delete button
     event.stopPropagation();
+
+    if (!confirm('Really delete "' + deletedAlbum.title + '"?')) return;
 
     // TODO: Delete the album from the database
     const foo = await this.albumService.deleteAlbum(deletedAlbum, this.round);

@@ -134,6 +134,11 @@ export class AlbumInfoComponent implements OnInit {
   }
 
   async deletePickedTrack(deletedPickedTrack: IPickedTrack) {
+    // Don't click any elements under the delete button
+    event.stopPropagation();
+    
+    if (!confirm('Really delete "' + deletedPickedTrack.title + '"?')) return;
+
     // TODO: Delete the picked track from its album in the database
     await this.albumService.deletePickedTrack(deletedPickedTrack, this.album);
 
