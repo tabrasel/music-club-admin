@@ -54,6 +54,12 @@ export class AlbumService {
     return this.httpClient.put<any>(this.hostUrl + 'api/album?id=' + id, updatedData);
   }
 
+  async deletePickedTrack(deletedPickedTrack: any, album: IAlbum): Promise<void> {
+    const newPickedTracks: any[] = album.pickedTracks.filter(pickedTrack => pickedTrack.trackNumber !== deletedPickedTrack.trackNumber);
+    const newAlbumData: any = { pickedTracks: newPickedTracks };
+    await this.updateAlbum(album.id, newAlbumData).toPromise();
+  }
+
   async deleteAlbum(deletedAlbum: IAlbum, round: IRound) {
     // Remove the album from it's round
     round.albumIds = round.albumIds.filter(albumId => albumId != deletedAlbum.id);

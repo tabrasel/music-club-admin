@@ -133,9 +133,9 @@ export class AlbumInfoComponent implements OnInit {
     this.pickedTrackForm.reset();
   }
 
-  deletePickedTrack(deletedPickedTrack: IPickedTrack) {
+  async deletePickedTrack(deletedPickedTrack: IPickedTrack) {
     // TODO: Delete the picked track from its album in the database
-    //const foo = await this.albumService.deleteAlbum(deletedAlbum, this.round);
+    await this.albumService.deletePickedTrack(deletedPickedTrack, this.album);
 
     // Remove the picked track's list item
     // TODO: Either needs a better unique identifier, or
