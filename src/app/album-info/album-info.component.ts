@@ -98,6 +98,14 @@ export class AlbumInfoComponent implements OnInit {
       pickerIds: form.pickerIds
     };
 
+    // Abort if the album already has a track with the same track number
+    for (let pickedTrack of this.album.pickedTracks) {
+      if (newPickedTrack.trackNumber === pickedTrack.trackNumber) {
+        alert('The album "' + this.album.title + '" already has a track #' + newPickedTrack.trackNumber);
+        return;
+      }
+    }
+
     // Update the picked track's album
 
     const newAlbumData = {};
@@ -136,7 +144,7 @@ export class AlbumInfoComponent implements OnInit {
   async deletePickedTrack(deletedPickedTrack: IPickedTrack) {
     // Don't click any elements under the delete button
     event.stopPropagation();
-    
+
     if (!confirm('Really delete "' + deletedPickedTrack.title + '"?')) return;
 
     // TODO: Delete the picked track from its album in the database
