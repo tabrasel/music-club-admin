@@ -65,13 +65,18 @@ export class AlbumService {
     round.albumIds = round.albumIds.filter(albumId => albumId != deletedAlbum.id);
     await this.roundService.updateRound(round.id, { albumIds: round.albumIds }).toPromise();
 
-    // TODO: Remove the album from it's poster's posted albums
+    // Remove the album from it's poster's posted albums
+    const poster: IMember = await this.memberService.getMemberById(deletedAlbum.posterId).toPromise();
+    const posterNewPostedAlbumIds: string[] = poster.postedAlbumIds.filter(albumId => albumId !== deletedAlbum.id);
+    await this.memberService.updateMember(poster.id, { postedAlbumIds: posterNewPostedAlbumIds }).toPromise();
 
-    // TODO: Delete the album's poster from the database if it was the only post they made
+    // Delete the album's poster from the database if it was the only post they made
+    if (posterNewPostedAlbumIds.length === 0) {
+      this.memberService.deleteMember(poster).subscribe();
+    }
 
     // Delete the album from the database
-    alert('deleting with ' + this.hostUrl + 'api/album?id=' + deletedAlbum.id);
-    await this.httpClient.delete<any>(this.hostUrl + 'api/album?id=' + deletedAlbum.id).toPromise();
+    this.httpClient.delete<any>(this.hostUrl + 'api/album?id=' + deletedAlbum.id).subscribe();
 
     return deletedAlbum;
   }

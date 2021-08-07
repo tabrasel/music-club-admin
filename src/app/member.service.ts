@@ -28,6 +28,11 @@ export class MemberService {
     return this.httpClient.put<any>(this.hostUrl + 'api/member?id=' + id, updatedData);
   }
 
+  deleteMember(deletedMember: IMember) {
+    // Delete the album from the database
+    return this.httpClient.delete<any>(this.hostUrl + 'api/member?id=' + deletedMember.id);
+  }
+
   getMemberById(id: string): any {
     return this.httpClient.get<IMember>(this.hostUrl + 'api/member?id=' + id);
   }
