@@ -40,4 +40,8 @@ export class MemberService {
   getMemberByName(firstName: string, lastName: string): any {
     return this.httpClient.get<IMember>(this.hostUrl + 'api/member?firstName=' + firstName + '&lastName=' + lastName);
   }
+
+  getAllMembers(): any {
+    return this.httpClient.get<IMember>(this.hostUrl + 'api/members');
+  }
 }

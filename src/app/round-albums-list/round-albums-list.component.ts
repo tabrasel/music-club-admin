@@ -33,6 +33,7 @@ export class RoundAlbumsListComponent implements OnInit {
   albumForm: FormGroup;
   albumListItems: IAlbumListItem[];
   selectedAlbum: IAlbum;
+  posterOptions: string[];
 
   @Input() round: IRound;
 
@@ -53,6 +54,14 @@ export class RoundAlbumsListComponent implements OnInit {
       trackCount: [null, Validators.required],
       imageUrl: [null, Validators.required],
       posterName: [null, Validators.required]
+    });
+
+    // List all members as poster options
+    this.memberService.getAllMembers().subscribe(allMembers => {
+      this.posterOptions = [];
+      for (let member of allMembers) {
+        this.posterOptions.push(member.firstName + ' ' + member.lastName);
+      }      
     });
 
     this.albumListItems = [];
