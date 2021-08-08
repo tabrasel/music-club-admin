@@ -39,9 +39,15 @@ export class AlbumService {
     // Create new album in database
     const newAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
 
-    // TODO: Add album to poster's list of posted albums
+    // Add album to poster's list of posted albums
+    // Add round to the poster's list of participated rounds
+    poster.participatedRoundIds.push(round.id);
     poster.postedAlbumIds.push(newAlbum.id);
-    await this.memberService.updateMember(poster.id, { postedAlbumIds: poster.postedAlbumIds }).toPromise();
+    const posterNewData = {
+      participatedRoundIds: poster.participatedRoundIds,
+      postedAlbumIds: poster.postedAlbumIds
+    };
+    await this.memberService.updateMember(poster.id, posterNewData).toPromise();
 
     // Add new album to its round
     round.albumIds.push(newAlbum.id);
