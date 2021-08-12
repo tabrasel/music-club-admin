@@ -45,18 +45,19 @@ export class RoundInfoComponent implements OnInit {
       this.modelService.getAlbum(albumId).subscribe(album => {
         this.modelService.getMember(album.posterId).subscribe(poster => {
           this.participants.push(poster);
+
+          // TODO: do this once after all participants are loaded rather than each time
+          // Sort participants by last name, first name
+          this.participants = this.participants.sort((a, b) => {
+            if (a.lastName < b.lastName)
+              return -1;
+            else if (a.lastName > b.lastName)
+              return 1;
+            return a.firstName < b.firstName ? -1 : 1;
+          });
         });
       });
     }
-
-    // Sort participants by last name, first name
-    this.participants.sort((a, b) => {
-      if (a.lastName < b.lastName)
-        return -1;
-      else if (a.lastName > b.lastName)
-        return 1;
-      return a.firstName < b.firstName ? -1 : 1;
-    });
   }
 
 }
