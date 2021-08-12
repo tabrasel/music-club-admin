@@ -89,10 +89,14 @@ export class ModelService {
 
     // Add album to poster's list of posted albums and add round to the poster's list of participated rounds
     this.getMember(albumInfo.posterId).subscribe(poster => {
+      poster.participatedRoundIds.push(round.id);
+      poster.postedAlbumIds.push(newAlbum.id);
+
       const posterNewData = {
-        participatedRoundIds: poster.participatedRoundIds.push(round.id),
-        postedAlbumIds: poster.postedAlbumIds.push(newAlbum.id)
+        participatedRoundIds: poster.participatedRoundIds,
+        postedAlbumIds: poster.postedAlbumIds
       };
+
       this.updateMember(poster.id, posterNewData).subscribe();
     })
 
