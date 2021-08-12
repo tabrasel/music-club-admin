@@ -1,0 +1,53 @@
+<p>members-view works!</p>
+
+<button id="add-member-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#member-form-modal">
+  <i class="fas fa-plus"></i>
+</button>
+
+<div class="list-group">
+
+  <div class="list-group-item list-group-item-action" *ngFor="let memberListItem of memberListItems">
+
+    <p>{{ memberListItem.member.firstName }} {{ memberListItem.member.lastName }}</p>
+
+    <!-- TODO: Other info: # participated rounds, first round, latest round, picked track overlaps with other members -->
+
+  </div>
+
+</div>
+
+<!-- Member form modal -->
+<div class="modal fade" id="member-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Member Editor</h5>
+      </div>
+
+      <div class="modal-body">
+        <form id="member-form" [formGroup]="memberForm" (ngSubmit)="submitMemberForm()" class="needs-validation">
+          <div class="row mb-3">
+
+            <div class="col-6 form-group">
+              <label class="form-label">First name</label>
+              <input type="text" formControlName="firstName" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+
+            <div class="col-6 form-group">
+              <label class="form-label">Last name</label>
+              <input type="text" formControlName="lastName" class="form-control form-control-sm" autocomplete="off" required/>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" id="member-modal-close-button" data-bs-dismiss="modal" (click)="clearMemberForm()">Cancel</button>
+        <button type="submit" form="member-form" class="btn btn-sm btn-primary" [disabled]="!memberForm.valid">Save</button>
+      </div>
+
+    </div>
+  </div>
+</div>

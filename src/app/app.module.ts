@@ -11,6 +11,7 @@ import { RoundsListComponent } from './rounds-list/rounds-list.component';
 import { RoundInfoComponent } from './round-info/round-info.component';
 import { RoundAlbumsListComponent } from './round-albums-list/round-albums-list.component';
 import { AlbumInfoComponent } from './album-info/album-info.component';
+import { MembersViewComponent } from './members-view/members-view.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { AlbumInfoComponent } from './album-info/album-info.component';
     RoundsListComponent,
     RoundInfoComponent,
     RoundAlbumsListComponent,
-    AlbumInfoComponent
+    AlbumInfoComponent,
+    MembersViewComponent
   ],
   imports: [
     BrowserModule,
