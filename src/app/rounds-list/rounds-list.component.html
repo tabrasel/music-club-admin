@@ -23,7 +23,7 @@
 
         <div class="flex-grow-1 px-2">
           <div class="h-100 d-flex flex-column justify-content-between">
-            
+
             <div>
 
               <h4>Round {{ roundListItem.round.number }}</h4>
@@ -37,6 +37,22 @@
             </div>
 
             <small>Started {{ roundListItem.round.startDate }}</small>
+
+            <div class="overlay">
+              <div class="hover-panel p-1">
+
+                <!-- Edit button -->
+                <button class="btn btn-secondary hover-panel-button mr-1" type="button" name="button">
+                  <i class="fas fa-edit"></i>
+                </button>
+
+                <!-- Delete button -->
+                <button class="btn btn-danger hover-panel-button" type="button" name="button" (click)="deleteRound(roundListItem.round)">
+                  <i class="fas fa-times"></i>
+                </button>
+
+              </div>
+            </div>
 
           </div>
         </div>

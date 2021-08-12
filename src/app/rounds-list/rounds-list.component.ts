@@ -71,6 +71,20 @@ export class RoundsListComponent implements OnInit {
     document.getElementById('round-modal-close-button').click();
   }
 
+  deleteRound(roundToDelete: IRound): void {
+    // Don't click any elements under the delete button
+    event.stopPropagation();
+
+    // Confirm that the round should be deleted
+    if (!confirm('Really delete round ' + roundToDelete.number + '? This will delete all its albums as well.')) return;
+
+    // Delete the round
+    this.modelService.deleteRound(roundToDelete).then(r => r.subscribe());
+
+    // Remove the list item for the round
+    this.roundListItems = this.roundListItems.filter(roundListItem => roundListItem.round.id !== roundToDelete.id);
+  }
+
   /**
    * Add a new round list item to the round list.
    * @param round the round to create a list item for
