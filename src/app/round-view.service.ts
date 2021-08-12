@@ -5,9 +5,7 @@ import { IAlbum } from './interfaces/IAlbum';
 import { IRound } from './interfaces/IRound';
 import { IMember } from './interfaces/IMember';
 
-import { AlbumService } from './album.service';
-import { MemberService } from './member.service';
-import { RoundService } from './round.service';
+import { ModelService } from './model.service';
 
 interface IRoundListItem {
   round: IRound;
@@ -27,9 +25,7 @@ export class RoundViewService {
   roundListItemsChange = this.roundListItems$.asObservable();
 
   constructor(
-    private albumService: AlbumService,
-    private memberService: MemberService,
-    private roundService: RoundService
+    private modelService: ModelService
   ) {
     this.selectedRound = null;
 
@@ -43,20 +39,20 @@ export class RoundViewService {
   async createAllRoundListItems(): Promise<void> {
     let roundListItems: IRoundListItem[] = [];
 
-    const allRounds = await this.roundService.getAllRounds().toPromise();
+    const allRounds = await this.modelService.getAllRounds().toPromise();
 
     for (let round of allRounds) {
       // Load the albums in the round
       const albums: IAlbum[] = [];
       for (let albumId of round.albumIds) {
-        const album: IAlbum = await this.albumService.getAlbumById(albumId).toPromise();
+        const album: IAlbum = await this.modelService.getAlbum(albumId).toPromise();
         albums.push(album);
       }
 
       // Load the participants in the round
       const participants: IMember[] = [];
       for (let album of albums) {
-        const participant: IMember = await this.memberService.getMemberById(album.posterId).toPromise();
+        const participant: IMember = await this.modelService.getMember(album.posterId).toPromise();
         participants.push(participant);
       }
 

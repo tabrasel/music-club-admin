@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 // Import model interfaces
-import { IAlbum } from '../interfaces/IAlbum';
-import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
-import { RoundService } from '../round.service';
+import { ModelService } from '../model.service';
 
 interface IAlbumForm {
   title: string;
@@ -26,7 +23,7 @@ export class RoundsViewComponent implements OnInit {
   selectedRound: IRound;
 
   constructor(
-    private roundService: RoundService
+    private modelService: ModelService
   ) { }
 
   ngOnInit(): void {

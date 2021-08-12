@@ -1,11 +1,10 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { AlbumService } from '../album.service';
-import { MemberService } from '../member.service';
-
 import { IAlbum } from '../interfaces/IAlbum';
 import { IMember } from '../interfaces/IMember';
+
+import { ModelService } from '../model.service';
 
 interface IPickedTrack {
   title: string;
@@ -40,8 +39,7 @@ export class AlbumInfoComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private albumService: AlbumService,
-    private memberService: MemberService
+    private modelService: ModelService
   ) { }
 
   ngOnInit(): void {
@@ -59,14 +57,13 @@ export class AlbumInfoComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     this.loadPickedTrackListItems();
 
-    this.memberService.getMemberById(this.album.posterId).subscribe(poster => {
+    this.modelService.getMember(this.album.posterId).subscribe(poster => {
       this.poster = poster;
     });
   }
 
   loadPickedTrackListItems(): void {
-    if (this.album === null)
-      return
+    if (this.album === null) return
 
     this.pickedTrackListItems = [];
 
@@ -119,7 +116,7 @@ export class AlbumInfoComponent implements OnInit {
       newAlbumData['topTrackNumber'] = form.trackNumber;
     }
 
-    await this.albumService.updateAlbum(this.album.id, newAlbumData).toPromise();
+    await this.modelService.updateAlbum(this.album.id, newAlbumData).toPromise();
 
     // Create a list item for the picked track
     const newPickedTrackListItem: IPickedTrackListItem = {
@@ -148,7 +145,7 @@ export class AlbumInfoComponent implements OnInit {
     if (!confirm('Really delete "' + deletedPickedTrack.title + '"?')) return;
 
     // TODO: Delete the picked track from its album in the database
-    await this.albumService.deletePickedTrack(deletedPickedTrack, this.album);
+    await this.modelService.deletePickedTrack(deletedPickedTrack, this.album);
 
     // Remove the picked track's list item
     // TODO: Either needs a better unique identifier, or

@@ -6,9 +6,8 @@ import { IAlbum } from '../interfaces/IAlbum';
 import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
-import { AlbumService } from '../album.service';
-import { RoundService } from '../round.service';
-import { RoundViewService } from '../round-view.service'
+import { RoundViewService } from '../round-view.service';
+import { ModelService } from '../model.service';
 
 interface IRoundForm {
   number: number;
@@ -38,9 +37,8 @@ export class RoundsListComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private albumService: AlbumService,
-    private roundService: RoundService,
-    private roundViewService: RoundViewService
+    private roundViewService: RoundViewService,
+    private modelService: ModelService
   ) { }
 
   ngOnInit(): void {
@@ -55,36 +53,46 @@ export class RoundsListComponent implements OnInit {
     this.selectedRound = null;
 
     this.roundViewService.roundListItemsChange.subscribe(roundListItems => {
-      this.roundListItems =  roundListItems;
+      this.roundListItems = roundListItems;
     });
   }
 
-  selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
-    this.selectedRound = selectedRoundListItem.round;
-    this.roundSelectEvent.emit(selectedRoundListItem.round);
-  }
-
-  async submitRoundForm(): Promise<void> {
+  submitRoundForm(): void {
     const form: IRoundForm = this.roundForm.value as IRoundForm;
 
-    // Create the round in the database
-    const newRound: IRound = await this.roundService.createRound(form).toPromise();
+    // TODO: Check if the new round has the same number as an existing round in the database
 
+    // Create the round in the database
+    this.modelService.createRound(form).subscribe(newRound => {
+      this.addRoundListItem(newRound);
+    });
+
+    // Close the round form modal
+    document.getElementById('round-modal-close-button').click();
+  }
+
+  /**
+   * Add a new round list item to the round list.
+   * @param round the round to create a list item for
+   */
+  addRoundListItem(round: IRound): void {
     // Create a list item for the round
-    const newRoundListItem: IRoundListItem = {
-      round: newRound,
+    const roundListItem: IRoundListItem = {
+      round: round,
       albums: [],
       members: []
     };
 
     // Add the round list item to the list
-    this.roundListItems.push(newRoundListItem);
+    this.roundListItems.push(roundListItem);
 
     // Sort round list items by descending round number
     this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
+  }
 
-    // Close the round form modal
-    document.getElementById('round-modal-close-button').click();
+  selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
+    this.selectedRound = selectedRoundListItem.round;
+    this.roundSelectEvent.emit(selectedRoundListItem.round);
   }
 
   clearRoundForm(): void {

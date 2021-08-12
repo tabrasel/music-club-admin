@@ -4,8 +4,7 @@ import { IAlbum } from '../interfaces/IAlbum';
 import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
-import { AlbumService } from '../album.service';
-import { MemberService } from '../member.service';
+import { ModelService } from '../model.service';
 
 @Component({
   selector: 'app-round-info',
@@ -20,8 +19,7 @@ export class RoundInfoComponent implements OnInit {
   @Input() round: IRound;
 
   constructor(
-    private albumService: AlbumService,
-    private memberService: MemberService
+    private modelService: ModelService
   ) { }
 
   ngOnInit(): void {
@@ -39,14 +37,16 @@ export class RoundInfoComponent implements OnInit {
     this.selectedAlbum = newSelectedAlbum;
   }
 
-  async loadParticipants(): Promise<void> {
+  loadParticipants(): void {
     if (this.round === null) return;
-    
+
     this.participants = [];
     for (let albumId of this.round.albumIds) {
-      const album: IAlbum = await this.albumService.getAlbumById(albumId).toPromise();
-      const poster: IMember = await this.memberService.getMemberById(album.posterId).toPromise();
-      this.participants.push(poster);
+      this.modelService.getAlbum(albumId).subscribe(album => {
+        this.modelService.getMember(album.posterId).subscribe(poster => {
+          this.participants.push(poster);
+        });
+      });
     }
 
     // Sort participants by last name, first name
