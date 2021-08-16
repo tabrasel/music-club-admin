@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { IAlbum } from '../interfaces/IAlbum';
 import { IMember } from '../interfaces/IMember';
@@ -36,11 +36,16 @@ export class AlbumInfoComponent implements OnInit {
   poster: IMember;
 
   @Input() album: IAlbum;
+  @Input() participants: IMember[];
 
   constructor(
     private formBuilder: FormBuilder,
     private modelService: ModelService
   ) { }
+
+  get pickerIdsFormArray() {
+    return this.pickedTrackForm.controls.pickerIds as FormArray;
+  }
 
   ngOnInit(): void {
     // Define the picked track form
@@ -48,10 +53,17 @@ export class AlbumInfoComponent implements OnInit {
       title: [null, Validators.required],
       trackNumber: [null, Validators.required],
       isTopTrack: [null],
-      pickerIds: [null]
+      pickerIds: new FormArray([])
     });
 
     this.loadPickedTrackListItems();
+
+    this.modelService.getAllMembers().subscribe(allMembers => {
+      this.participants = allMembers;
+      allMembers.forEach(member => {
+        this.pickerIdsFormArray.push(new FormControl(false));
+      });
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -88,11 +100,16 @@ export class AlbumInfoComponent implements OnInit {
     // ensure that the track number can be used as a unique ID (helpful for deletion). Maybe also warn if there is a
     // picked track with the same name.
 
+    // Set the picked track's pickers
+    const selectedPickerIds = this.pickedTrackForm.value.pickerIds
+      .map((checked, i) => checked ? this.participants[i].id : null)
+      .filter(v => v !== null);
+
     // Create the picked track in the database
     const newPickedTrack: IPickedTrack = {
       title: form.title,
       trackNumber: form.trackNumber,
-      pickerIds: form.pickerIds
+      pickerIds: selectedPickerIds
     };
 
     // Abort if the album already has a track with the same track number

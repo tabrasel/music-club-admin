@@ -64,8 +64,11 @@
 
       <div class="modal-body">
         <form id="picked-track-form" [formGroup]="pickedTrackForm" (ngSubmit)="submitPickedTrackForm()" class="needs-validation">
+
           <div class="row">
+
             <div class="col-6">
+
               <div class="form-group mb-3">
                 <label class="form-label">Title</label>
                 <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required/>
@@ -82,14 +85,21 @@
                   <label class="form-check-label" for="flexCheckDefault">Is Top Track?</label>
                 </div>
               </div>
+
             </div>
 
             <div class="col-6">
               <div class="form-group">
                 <label class="form-label">Pickers</label>
+                <div class="form-check" formArrayName="pickerIds" *ngFor="let participant of pickerIdsFormArray.controls; let i = index">
+                  <input class="form-check-input" type="checkbox" [formControlName]="i" value="participant.id">
+                  <label class="form-check-label">{{ participants[i].firstName }} {{ participants[i].lastName }}</label>
+                </div>
               </div>
             </div>
+
           </div>
+
         </form>
       </div>
 
