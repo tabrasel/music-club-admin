@@ -27,7 +27,17 @@
 
         <div class="position-relative list-group-item picked-track-list-item" [class.top-track]="album.topTrackNumber !== null && album.topTrackNumber === pickedTrackListItem.pickedTrack.trackNumber" *ngFor="let pickedTrackListItem of pickedTrackListItems">
 
-          <p>{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
+          <div class="d-flex justify-content-between">
+
+            <p>{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
+
+            <div class="d-flex">
+              <div class="picker-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let picker of pickedTrackListItem.pickers">
+                <p *ngIf="picker !== null">{{ picker.firstName[0] + picker.lastName[0] }}</p>
+              </div>
+            </div>
+
+          </div>
 
           <div class="picked-track-list-item-overlay">
             <div class="hover-panel p-1">

@@ -25,10 +25,6 @@ h3 {
   background-color: whitesmoke;
 }
 
-.list-group-item {
-  cursor: pointer;
-}
-
 .picked-track-list-item-overlay {
   position: absolute;
   left: 0px;
@@ -57,6 +53,15 @@ h3 {
   max-height: 28px;
   padding: 0px;
   color: white;
+}
+
+.picker-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-block;
+  font-size: 12px;
+  border: 1px solid black;
+  border-radius: 50%;
 }
 
 .top-track {

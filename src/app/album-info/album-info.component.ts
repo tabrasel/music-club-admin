@@ -56,7 +56,7 @@ export class AlbumInfoComponent implements OnInit {
       pickerIds: new FormArray([])
     });
 
-    this.loadPickedTrackListItems();
+    //this.loadPickedTrackListItems();
 
     this.modelService.getAllMembers().subscribe(allMembers => {
       this.participants = allMembers;
@@ -80,17 +80,27 @@ export class AlbumInfoComponent implements OnInit {
     this.pickedTrackListItems = [];
 
     for (let pickedTrack of this.album.pickedTracks) {
-      // TODO: Load pickers from picker ids
+      // Load pickers
+      const pickerPromises: Promise<IMember>[] = [];
+      for (let pickerId of pickedTrack.pickerIds) {
+        const pickerPromise: Promise<IMember> = this.modelService.getMember(pickerId).toPromise();
+        pickerPromises.push(pickerPromise);
+      }
 
-      const pickedTrackListItem: IPickedTrackListItem = {
-        pickedTrack: pickedTrack,
-        pickers: []
-      };
-      this.pickedTrackListItems.push(pickedTrackListItem);
+      // Create list item once all pickers are loaded
+      Promise.all(pickerPromises).then(pickers => {
+        const pickedTrackListItem: IPickedTrackListItem = {
+          pickedTrack: pickedTrack,
+          pickers: pickers
+        };
+        this.pickedTrackListItems.push(pickedTrackListItem);
+      }).then(() => {
+        // Sort picked track list items by track number
+        this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+      });
     }
 
-    // Sort picked track list items by track number
-    this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+
   }
 
   async submitPickedTrackForm(): Promise<void> {
