@@ -77,23 +77,15 @@ export class RoundAlbumsListComponent implements OnInit {
     this.albumListItems = [];
 
     // Create promises for album list items
-    const albumListItemPromises: Promise<IAlbumListItem>[] = [];
-    for (let albumId of this.round.albumIds) {
+    const albumListItemPromises: Promise<IAlbumListItem>[] = this.round.albumIds.map(async albumId => {
       const album: IAlbum = await this.modelService.getAlbum(albumId).toPromise();
-      const albumListItemPromise: Promise<IAlbumListItem> = this.createAlbumListItem(album);
-      albumListItemPromises.push(albumListItemPromise);
-    }
+      return this.createAlbumListItem(album);
+    });
 
     // Once all album list items have been created
     Promise.all(albumListItemPromises).then(albumListItems => {
-      // Store album list items in a temporary list
-      const tempAlbumListItems: IAlbumListItem[] = [];
-      for (let albumListItem of albumListItems) {
-        tempAlbumListItems.push(albumListItem);
-      }
-
       // Sort the temporary list of album list items by poster name
-      this.albumListItems = tempAlbumListItems.sort((a, b) => {
+      this.albumListItems = albumListItems.sort((a, b) => {
         if (a.poster.lastName < b.poster.lastName)
           return -1;
         else if (a.poster.lastName > b.poster.lastName)
@@ -106,8 +98,6 @@ export class RoundAlbumsListComponent implements OnInit {
   async createAlbumListItem(album: IAlbum): Promise<IAlbumListItem> {
     // Get the album's poster
     const poster: IMember = await this.modelService.getMember(album.posterId).toPromise();
-
-    // TODO: Update round list item icon to include album image
 
     // Create the album list item
     const albumListItem: IAlbumListItem = {
@@ -143,6 +133,8 @@ export class RoundAlbumsListComponent implements OnInit {
         return 1;
       return a.poster.firstName < b.poster.firstName ? -1 : 1;
     });
+
+    // TODO: Update round list item icon to include album image
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
