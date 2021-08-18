@@ -76,19 +76,30 @@ export class RoundAlbumsListComponent implements OnInit {
   async loadAlbumListItems(): Promise<void> {
     this.albumListItems = [];
 
+    // Create promises for album list items
+    const albumListItemPromises: Promise<IAlbumListItem>[] = [];
     for (let albumId of this.round.albumIds) {
       const album: IAlbum = await this.modelService.getAlbum(albumId).toPromise();
-      const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
-      this.albumListItems.push(albumListItem);
+      const albumListItemPromise: Promise<IAlbumListItem> = this.createAlbumListItem(album);
+      albumListItemPromises.push(albumListItemPromise);
     }
 
-    // Sort album list items by poster name
-    this.albumListItems = this.albumListItems.sort((a, b) => {
-      if (a.poster.lastName < b.poster.lastName)
-        return -1;
-      else if (a.poster.lastName > b.poster.lastName)
-        return 1;
-      return a.poster.firstName < b.poster.firstName ? -1 : 1;
+    // Once all album list items have been created
+    Promise.all(albumListItemPromises).then(albumListItems => {
+      // Store album list items in a temporary list
+      const tempAlbumListItems: IAlbumListItem[] = [];
+      for (let albumListItem of albumListItems) {
+        tempAlbumListItems.push(albumListItem);
+      }
+
+      // Sort the temporary list of album list items by poster name
+      this.albumListItems = tempAlbumListItems.sort((a, b) => {
+        if (a.poster.lastName < b.poster.lastName)
+          return -1;
+        else if (a.poster.lastName > b.poster.lastName)
+          return 1;
+        return a.poster.firstName < b.poster.firstName ? -1 : 1;
+      });
     });
   }
 
@@ -123,7 +134,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Add the album list item to the list
     this.albumListItems.push(albumListItem);
-    
+
     // Sort album list items by poster name
     this.albumListItems = this.albumListItems.sort((a, b) => {
       if (a.poster.lastName < b.poster.lastName)
