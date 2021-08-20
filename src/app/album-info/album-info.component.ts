@@ -74,33 +74,40 @@ export class AlbumInfoComponent implements OnInit {
     });
   }
 
-  loadPickedTrackListItems(): void {
-    if (this.album === null) return
+  async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {
+    // Create promises for the pickers
+    const pickerPromises: Promise<IMember>[] = [];
+    for (let pickerId of pickedTrack.pickerIds) {
+      const pickerPromise: Promise<IMember> = this.modelService.getMember(pickerId).toPromise();
+      pickerPromises.push(pickerPromise);
+    }
 
-    this.pickedTrackListItems = [];
-
-    for (let pickedTrack of this.album.pickedTracks) {
-      // Load pickers
-      const pickerPromises: Promise<IMember>[] = [];
-      for (let pickerId of pickedTrack.pickerIds) {
-        const pickerPromise: Promise<IMember> = this.modelService.getMember(pickerId).toPromise();
-        pickerPromises.push(pickerPromise);
-      }
-
-      // Create list item once all pickers are loaded
-      Promise.all(pickerPromises).then(pickers => {
+    // Create list item once all pickers are loaded
+    return Promise.all(pickerPromises)
+      .then(pickers => {
         const pickedTrackListItem: IPickedTrackListItem = {
           pickedTrack: pickedTrack,
           pickers: pickers
         };
-        this.pickedTrackListItems.push(pickedTrackListItem);
-      }).then(() => {
-        // Sort picked track list items by track number
-        this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
-      });
-    }
+        return pickedTrackListItem;
+      })
+      .catch(error => {
+        return null;
+      })
+  }
 
+  loadPickedTrackListItems(): void {
+    if (this.album === null) return;
 
+    const pickedTrackListItemPromises: Promise<IPickedTrackListItem>[] = this.album.pickedTracks.map(async pickedTrack => {
+      return this.createPickedTrackListItem(pickedTrack);
+    });
+
+    // Once all picked track list items are created
+    Promise.all(pickedTrackListItemPromises).then(pickedTrackListItems => {      
+      // Sort picked track list items by track number
+      this.pickedTrackListItems = pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+    });
   }
 
   async submitPickedTrackForm(): Promise<void> {
