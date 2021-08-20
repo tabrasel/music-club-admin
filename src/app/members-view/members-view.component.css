@@ -1,0 +1,8 @@
+#add-member-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #212529;
+  color: white;
+}

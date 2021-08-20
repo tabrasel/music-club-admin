@@ -1,16 +1,33 @@
-<p>members-view works!</p>
+<div class="h-100 row g-0">
 
-<button id="add-member-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#member-form-modal">
-  <i class="fas fa-plus"></i>
-</button>
+  <div class="h-100 p-3 col-3 d-flex flex-column">
 
-<div class="list-group">
+    <!-- Header and add button -->
+    <div class="mb-2 d-flex justify-content-between align-items-center">
 
-  <div class="list-group-item list-group-item-action" *ngFor="let memberListItem of memberListItems">
+      <h2 class="m-0">Members</h2>
 
-    <p>{{ memberListItem.member.firstName }} {{ memberListItem.member.lastName }}</p>
+      <button id="add-member-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#member-form-modal">
+        <i class="fas fa-plus"></i>
+      </button>
 
-    <!-- TODO: Other info: # participated rounds, first round, latest round, picked track overlaps with other members -->
+    </div>
+
+    <div class="list-group">
+
+      <div class="list-group-item list-group-item-action" *ngFor="let memberListItem of memberListItems">
+
+        <p>{{ memberListItem.member.firstName }} {{ memberListItem.member.lastName }}</p>
+
+        <!-- TODO: Other info: # participated rounds, first round, latest round, picked track overlaps with other members -->
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="h-100 col-9">
 
   </div>
 
