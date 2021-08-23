@@ -32,6 +32,7 @@ export class RoundsListComponent implements OnInit {
   roundForm: FormGroup;
   roundListItems: IRoundListItem[];
   selectedRound: IRound;
+  roundToUpdateId: string;
 
   @Output() roundSelectEvent = new EventEmitter<IRound>();
 
@@ -51,6 +52,7 @@ export class RoundsListComponent implements OnInit {
 		});
 
     this.selectedRound = null;
+    this.roundToUpdateId = null;
 
     this.roundViewService.roundListItemsChange.subscribe(roundListItems => {
       this.roundListItems = roundListItems;
@@ -58,17 +60,39 @@ export class RoundsListComponent implements OnInit {
   }
 
   submitRoundForm(): void {
-    const form: IRoundForm = this.roundForm.value as IRoundForm;
+    const formValues: IRoundForm = this.roundForm.value as IRoundForm;
 
     // TODO: Check if the new round has the same number as an existing round in the database
 
-    // Create the round in the database
-    this.modelService.createRound(form).subscribe(newRound => {
-      this.addRoundListItem(newRound);
-    });
+    if (this.roundToUpdateId == null) {
+      // Create the round in the database
+      this.modelService.createRound(formValues).subscribe(createdRound => {
+        this.addRoundListItem(createdRound);
+      });
+    } else {
+      // Update the round in the database
+      this.modelService.updateRound(this.roundToUpdateId, formValues).subscribe(updatedRound => {
+        // Update the list item for the round
+        //this.roundListItems = this.roundListItems.filter(roundListItem => roundListItem.round.id !== roundToDelete.id);
+      });
+      this.roundToUpdateId = null;
+    }
 
     // Close the round form modal
     document.getElementById('round-modal-close-button').click();
+  }
+
+  populateRoundForm(roundToUpdate: IRound): void {
+    // Don't click any elements under the edit button
+    event.stopPropagation();
+
+    // Set round form values
+    this.roundForm.controls.number.setValue(roundToUpdate.number);
+    this.roundForm.controls.picksPerParticipant.setValue(roundToUpdate.picksPerParticipant);
+    this.roundForm.controls.startDate.setValue(roundToUpdate.startDate);
+    this.roundForm.controls.endDate.setValue(roundToUpdate.endDate);
+
+    this.roundToUpdateId = roundToUpdate.id;
   }
 
   deleteRound(roundToDelete: IRound): void {
