@@ -84,10 +84,6 @@ h1, p {
 }
 
 .particpant-icon {
-  display: inline;
-}
-
-.particpant-icon {
   width: 28px;
   height: 28px;
   display: inline-block;
