@@ -20,14 +20,14 @@
         <div class="overlay">
           <div class="hover-panel p-1">
 
-            <!-- Edit button -->
-            <button class="btn btn-secondary hover-panel-button mr-1" type="button" name="button">
-              <i class="fas fa-edit"></i>
+            <!-- Delete button -->
+            <button class="btn btn-danger hover-panel-button mb-1" type="button" name="button" (click)="deleteAlbum(albumListItem.album)">
+              <i class="fas fa-times"></i>
             </button>
 
-            <!-- Delete button -->
-            <button class="btn btn-danger hover-panel-button" type="button" name="button" (click)="deleteAlbum(albumListItem.album)">
-              <i class="fas fa-times"></i>
+            <!-- Edit button -->
+            <button class="btn btn-secondary hover-panel-button" type="button" name="button">
+              <i class="fas fa-edit"></i>
             </button>
 
           </div>

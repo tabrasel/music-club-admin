@@ -35,8 +35,8 @@
 
 .overlay:hover .hover-panel {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .hover-panel {
@@ -56,10 +56,10 @@
 }
 
 .album-icon {
-  min-width: 136px;
-  min-height: 136px;
-  max-width: 136px;
-  max-height: 136px;
+  min-width: 96px;
+  min-height: 96px;
+  max-width: 96px;
+  max-height: 96px;
   background-color: lightgray;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px;
 }

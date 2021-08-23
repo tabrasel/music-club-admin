@@ -54,8 +54,8 @@ h1, p {
 
 .overlay:hover .hover-panel {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .hover-panel {
