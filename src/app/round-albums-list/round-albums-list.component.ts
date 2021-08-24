@@ -32,6 +32,7 @@ export class RoundAlbumsListComponent implements OnInit {
   albumListItems: IAlbumListItem[];
   selectedAlbum: IAlbum;
   allMembers: IMember[];
+  albumToUpdateId: string;
 
   @Input() round: IRound;
 
@@ -64,6 +65,8 @@ export class RoundAlbumsListComponent implements OnInit {
         return a.firstName < b.firstName ? -1 : 1;
       });
     });
+
+    this.albumToUpdateId = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -114,30 +117,44 @@ export class RoundAlbumsListComponent implements OnInit {
   }
 
   async submitAlbumForm(): Promise<void> {
-    const form: IAlbumForm = this.albumForm.value as IAlbumForm;
+    const formValues: IAlbumForm = this.albumForm.value as IAlbumForm;
 
-    // Create the album
-    const album: IAlbum = await this.modelService.createAlbum(form, this.round);
+    if (this.albumToUpdateId === null) {
+      // Create the album
+      const album: IAlbum = await this.modelService.createAlbum(formValues, this.round);
 
-    // Create the album list item
-    const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
+      // Create the album list item
+      const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
 
-    // Add the album list item to the list
-    this.albumListItems.push(albumListItem);
+      // Add the album list item to the list
+      this.albumListItems.push(albumListItem);
 
-    // Sort album list items by poster name
-    this.albumListItems = this.albumListItems.sort((a, b) => {
-      if (a.poster.lastName < b.poster.lastName)
-        return -1;
-      else if (a.poster.lastName > b.poster.lastName)
-        return 1;
-      return a.poster.firstName < b.poster.firstName ? -1 : 1;
-    });
+      this.sortAlbumListItems();
+    } else {
+      this.modelService.updateAlbum(this.albumToUpdateId, formValues).subscribe(updatedAlbum => {
+        // TODO: Update the list item for the round
+        this.sortAlbumListItems();
+      });
+    }
 
     // TODO: Update round list item icon to include album image
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
+  }
+
+  populateAlbumForm(album: IAlbum): void {
+    // Don't click any elements under the edit button
+    event.stopPropagation();
+
+    // Set album form values
+    this.albumForm.controls.title.setValue(album.title);
+    this.albumForm.controls.artist.setValue(album.artist);
+    this.albumForm.controls.trackCount.setValue(album.trackCount);
+    this.albumForm.controls.imageUrl.setValue(album.imageUrl);
+    this.albumForm.controls.posterId.setValue(album.posterId);
+
+    this.albumToUpdateId = album.id;
   }
 
   deleteAlbum(deletedAlbum: IAlbum): void {
@@ -155,6 +172,16 @@ export class RoundAlbumsListComponent implements OnInit {
 
   clearAlbumForm(): void {
     this.albumForm.reset();
+  }
+
+  sortAlbumListItems(): void {
+    this.albumListItems = this.albumListItems.sort((a, b) => {
+      if (a.poster.lastName < b.poster.lastName)
+        return -1;
+      else if (a.poster.lastName > b.poster.lastName)
+        return 1;
+      return a.poster.firstName < b.poster.firstName ? -1 : 1;
+    });
   }
 
 }
