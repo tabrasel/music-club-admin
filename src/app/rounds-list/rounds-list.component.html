@@ -29,7 +29,7 @@
               <h4>Round {{ roundListItem.round.number }}</h4>
 
               <div class="d-flex">
-                <div class="particpant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let member of roundListItem.members">
+                <div class="participant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let member of roundListItem.members">
                   <p *ngIf="member !== null">{{ member.firstName[0] + member.lastName[0] }}</p>
                 </div>
               </div>
