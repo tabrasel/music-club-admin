@@ -9,8 +9,9 @@
         <h4>{{ album.artist }}</h4>
       </div>
 
-      <div>
+      <div class="d-flex flex-column align-items-end">
         <small *ngIf="poster !== null && poster !== undefined">Posted by {{ poster.firstName }} {{ poster.lastName }}</small>
+        <small>Spread: {{ spreadScore | number : '1.3-3' }}</small>
       </div>
 
     </header>

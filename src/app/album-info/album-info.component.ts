@@ -3,6 +3,7 @@ import { FormArray, FormControl, FormBuilder, FormGroup, Validators } from '@ang
 
 import { IAlbum } from '../interfaces/IAlbum';
 import { IMember } from '../interfaces/IMember';
+import { IRound } from '../interfaces/IRound';
 
 import { ModelService } from '../model.service';
 
@@ -34,9 +35,11 @@ export class AlbumInfoComponent implements OnInit {
   pickedTrackForm: FormGroup;
   pickedTrackListItems: any[];
   poster: IMember;
+  spreadScore: number;
 
   @Input() album: IAlbum;
   @Input() participants: IMember[];
+  @Input() round: IRound;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -64,6 +67,8 @@ export class AlbumInfoComponent implements OnInit {
         this.pickerIdsFormArray.push(new FormControl(false));
       });
     });
+  ngOnInit(): void {
+    this.calculateScore();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -72,8 +77,13 @@ export class AlbumInfoComponent implements OnInit {
     this.modelService.getMember(this.album.posterId).subscribe(poster => {
       this.poster = poster;
     });
+    this.calculateScore();
   }
 
+  calculateScore(): void {
+    const avgVotesPerPickedTrack: number = (this.round.picksPerParticipant * this.participants.length) / this.album.pickedTracks.length;
+    this.spreadScore = this.album.trackCount / ( avgVotesPerPickedTrack);
+  }
   async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {
     // Create promises for the pickers
     const pickerPromises: Promise<IMember>[] = [];
