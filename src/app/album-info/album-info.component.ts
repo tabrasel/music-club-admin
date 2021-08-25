@@ -35,6 +35,8 @@ export class AlbumInfoComponent implements OnInit {
   pickedTrackForm: FormGroup;
   pickedTrackListItems: any[];
   poster: IMember;
+  pickerIdsControl: FormArray;
+
   spreadScore: number;
 
   @Input() album: IAlbum;
@@ -44,29 +46,25 @@ export class AlbumInfoComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private modelService: ModelService
-  ) { }
+  ) {
+    // TODO: Form initialization should really be done in ngOnInit(), but then the form manipulation in ngOnChanges()
+    // might run before the form is initialized...
 
-  get pickerIdsFormArray() {
-    return this.pickedTrackForm.controls.pickerIds as FormArray;
-  }
+    this.pickerIdsControl = new FormArray([]);
 
-  ngOnInit(): void {
     // Define the picked track form
     this.pickedTrackForm = this.formBuilder.group({
       title: [null, Validators.required],
       trackNumber: [null, Validators.required],
       isTopTrack: [null],
-      pickerIds: new FormArray([])
+      pickerIds: this.pickerIdsControl
     });
+  }
 
-    //this.loadPickedTrackListItems();
+  get pickerIdsFormArray() {
+    return this.pickedTrackForm.controls.pickerIds as FormArray;
+  }
 
-    this.modelService.getAllMembers().subscribe(allMembers => {
-      this.participants = allMembers;
-      allMembers.forEach(member => {
-        this.pickerIdsFormArray.push(new FormControl(false));
-      });
-    });
   ngOnInit(): void {
     this.calculateScore();
   }
@@ -77,6 +75,12 @@ export class AlbumInfoComponent implements OnInit {
     this.modelService.getMember(this.album.posterId).subscribe(poster => {
       this.poster = poster;
     });
+
+    this.pickerIdsControl.clear();
+    this.participants.forEach(participant => {
+      this.pickerIdsControl.push(new FormControl(false));
+    });
+
     this.calculateScore();
   }
 
@@ -84,6 +88,7 @@ export class AlbumInfoComponent implements OnInit {
     const avgVotesPerPickedTrack: number = (this.round.picksPerParticipant * this.participants.length) / this.album.pickedTracks.length;
     this.spreadScore = this.album.trackCount / ( avgVotesPerPickedTrack);
   }
+
   async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {
     // Create promises for the pickers
     const pickerPromises: Promise<IMember>[] = [];
@@ -114,7 +119,7 @@ export class AlbumInfoComponent implements OnInit {
     });
 
     // Once all picked track list items are created
-    Promise.all(pickedTrackListItemPromises).then(pickedTrackListItems => {      
+    Promise.all(pickedTrackListItemPromises).then(pickedTrackListItems => {
       // Sort picked track list items by track number
       this.pickedTrackListItems = pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
     });
