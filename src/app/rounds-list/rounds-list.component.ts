@@ -48,7 +48,7 @@ export class RoundsListComponent implements OnInit {
 			number: [null, Validators.required],
 			startDate: [null, Validators.required],
       endDate: [null, Validators.required],
-      picksPerParticipant: [null, Validators.required]
+      picksPerParticipant: [3, Validators.required]
 		});
 
     this.selectedRound = null;
