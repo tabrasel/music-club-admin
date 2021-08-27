@@ -9,18 +9,26 @@
         <h4>{{ album.artist }}</h4>
       </div>
 
-      <div class="d-flex flex-column align-items-end">
-        <small *ngIf="poster !== null && poster !== undefined">Posted by {{ poster.firstName }} {{ poster.lastName }}</small>
-        <small>Spread: {{ spreadScore | number : '1.3-3' }}</small>
+      <div class="poster-icon">
+        <p class="m-0" *ngIf="poster !== null">{{ poster.firstName[0] + poster.lastName[0] }}</p>
       </div>
 
     </header>
 
     <div class="mb-2 d-flex justify-content-between align-items-center">
       <h5 class="m-0">Picked Tracks (of {{ album.trackCount }})</h5>
-      <button id="add-picked-track-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
-        <i class="fas fa-plus"></i>
-      </button>
+
+      <div class="">
+        <small class="mr-3" title="The 'impressiveness' of vote overlap. If albums A and B have 15 songs each and A has 5 picks while B has 10, album A's vote overlap is more impressive. Likewise, if albums A and B have 7 picks each and A has 10 songs and B has 15, album B's vote overlap is more impressive. Overlap becomes less impressive as the number of participants and votes per participant increase."><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.2-2' }}</small>
+
+        <small class="mr-3" title="The ratio of 'bad' to 'good' songs. Basically, for each picked song, how many other songs went unpicked?"><i class="fas fa-theater-masks"></i> {{ unpickedRatio | number : '1.2-2' }}</small>
+
+        <small class="mr-3" title="The percentage of album songs liked by at least one participant"><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
+
+        <button id="add-picked-track-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
     </div>
 
     <div class="flex-grow-1 position-relative">
@@ -28,9 +36,9 @@
 
         <div class="position-relative list-group-item picked-track-list-item" [class.top-track]="album.topTrackNumber !== null && album.topTrackNumber === pickedTrackListItem.pickedTrack.trackNumber" *ngFor="let pickedTrackListItem of pickedTrackListItems">
 
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between align-items-center">
 
-            <p>{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
+            <p class="picked-track-title">{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
 
             <div class="d-flex">
               <div class="picker-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let picker of pickedTrackListItem.pickers">

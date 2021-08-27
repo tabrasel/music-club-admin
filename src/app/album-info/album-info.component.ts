@@ -37,7 +37,10 @@ export class AlbumInfoComponent implements OnInit {
   poster: IMember;
   pickerIdsControl: FormArray;
 
-  spreadScore: number;
+  // Album metrics
+  concensusScore: number;
+  coverage: number;
+  unpickedRatio: number;
 
   @Input() album: IAlbum;
   @Input() participants: IMember[];
@@ -66,7 +69,7 @@ export class AlbumInfoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.calculateScore();
+    this.calculateMetrics();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -81,12 +84,18 @@ export class AlbumInfoComponent implements OnInit {
       this.pickerIdsControl.push(new FormControl(false));
     });
 
-    this.calculateScore();
+    this.calculateMetrics();
   }
 
-  calculateScore(): void {
-    const avgVotesPerPickedTrack: number = (this.round.picksPerParticipant * this.participants.length) / this.album.pickedTracks.length;
-    this.spreadScore = this.album.trackCount / ( avgVotesPerPickedTrack);
+  calculateMetrics(): void {
+    const trackCount = this.album.trackCount;
+    const pickedTracksCount = this.album.pickedTracks.length;
+    const participantsCount = this.participants.length;
+    const picksPerParticipant = this.round.picksPerParticipant;
+
+    this.concensusScore = trackCount / (pickedTracksCount * picksPerParticipant * participantsCount);
+    this.unpickedRatio = (trackCount - pickedTracksCount) / pickedTracksCount;
+    this.coverage = pickedTracksCount / trackCount * 100;
   }
 
   async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {
@@ -139,7 +148,7 @@ export class AlbumInfoComponent implements OnInit {
 
     // Create the picked track in the database
     const newPickedTrack: IPickedTrack = {
-      title: form.title,
+      title: form.title.trim(),
       trackNumber: form.trackNumber,
       pickerIds: selectedPickerIds
     };

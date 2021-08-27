@@ -56,12 +56,34 @@ h3 {
 }
 
 .picker-icon {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: inline-block;
-  font-size: 12px;
+  font-size: 11px;
   border: 1px solid black;
   border-radius: 50%;
+}
+
+.list-group-item {
+  padding: 0.4rem 0.6rem;
+}
+
+.poster-icon {
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  font-size: 20px;
+  border: 1px solid black;
+  border-radius: 50%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.picked-track-title {
+  font-size: 14px;
 }
 
 .top-track {
