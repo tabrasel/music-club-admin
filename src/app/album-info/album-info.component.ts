@@ -73,6 +73,7 @@ export class AlbumInfoComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+
     this.loadPickedTrackListItems();
 
     this.modelService.getMember(this.album.posterId).subscribe(poster => {
@@ -172,24 +173,25 @@ export class AlbumInfoComponent implements OnInit {
     // Set picked track as top track in its album if it's selected
     if (form.isTopTrack && form.trackNumber !== this.album.topTrackNumber) {
       newAlbumData['topTrackNumber'] = form.trackNumber;
+      this.album.topTrackNumber = form.trackNumber;
     }
 
     await this.modelService.updateAlbum(this.album.id, newAlbumData).toPromise();
 
     // Create a list item for the picked track
-    const newPickedTrackListItem: IPickedTrackListItem = {
-      pickedTrack: newPickedTrack,
-      pickers: []
-    };
+    this.createPickedTrackListItem(newPickedTrack)
+      .then(newPickedTrackListItem => {
+        // Add the picked track list item to the list
+        this.pickedTrackListItems.push(newPickedTrackListItem);
 
-    // Add the picked track list item to the list
-    this.pickedTrackListItems.push(newPickedTrackListItem);
-
-    // Sort picked track list items by track number
-    this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+        // Sort picked track list items by track number
+        this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+      });
 
     // Close the picked track form modal
     document.getElementById('picked-track-modal-close-button').click();
+
+    this.calculateMetrics();
   }
 
   clearPickedTrackForm(): void {
@@ -208,6 +210,8 @@ export class AlbumInfoComponent implements OnInit {
     // Remove the picked track's list item
     // TODO: Either needs a better unique identifier, or
     this.pickedTrackListItems = this.pickedTrackListItems.filter(pickedTrackListItem => pickedTrackListItem.pickedTrack.trackNumber != deletedPickedTrack.trackNumber);
+
+    this.calculateMetrics();
   }
 
 }
