@@ -21,9 +21,9 @@
       <div class="">
         <small class="mr-3" title="The 'impressiveness' of vote overlap. If albums A and B have 15 songs each and A has 5 picks while B has 10, album A's vote overlap is more impressive. Likewise, if albums A and B have 7 picks each and A has 10 songs and B has 15, album B's vote overlap is more impressive. Overlap becomes less impressive as the number of participants and votes per participant increase."><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.2-2' }}</small>
 
-        <small class="mr-3" title="The ratio of 'bad' to 'good' songs. Basically, for each picked song, how many other songs went unpicked?"><i class="fas fa-theater-masks"></i> {{ unpickedRatio | number : '1.2-2' }}</small>
+        <small class="mr-3" title="The ratio of 'bad' to 'good' songs. In other words: for each picked song, how many other songs went unpicked?"><i class="fas fa-theater-masks"></i> {{ unpickedRatio | number : '1.2-2' }}</small>
 
-        <small class="mr-3" title="The percentage of album songs liked by at least one participant"><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
+        <small class="mr-3" title="The percentage of liked songs out of the whole album."><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
 
         <button id="add-picked-track-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
           <i class="fas fa-plus"></i>
