@@ -93,10 +93,17 @@ export class AlbumInfoComponent implements OnInit {
     const pickedTracksCount = this.album.pickedTracks.length;
     const participantsCount = this.participants.length;
     const picksPerParticipant = this.round.picksPerParticipant;
-
-    this.concensusScore = trackCount / (pickedTracksCount * picksPerParticipant * participantsCount);
+    
     this.unpickedRatio = (trackCount - pickedTracksCount) / pickedTracksCount;
     this.coverage = pickedTracksCount / trackCount * 100;
+
+    if (pickedTracksCount < picksPerParticipant) {
+      this.concensusScore = 100;
+    } else if (pickedTracksCount > picksPerParticipant * participantsCount) {
+      this.concensusScore = 0;
+    } else {
+      this.concensusScore = (1 - ((pickedTracksCount - picksPerParticipant) / (picksPerParticipant * participantsCount - picksPerParticipant))) * 100;
+    }
   }
 
   async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {

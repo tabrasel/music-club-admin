@@ -2,7 +2,7 @@
 
   <div class="h-100 p-3 d-flex flex-column border rounded" id="foo">
 
-    <header class="mb-3 d-flex justify-content-between">
+    <header class="mb-2 d-flex justify-content-between">
 
       <div>
         <h3>{{ album.title }}</h3>
@@ -19,9 +19,7 @@
       <h5 class="m-0">Picked Tracks (of {{ album.trackCount }})</h5>
 
       <div class="">
-        <small class="mr-3" title="The 'impressiveness' of vote overlap. If albums A and B have 15 songs each and A has 5 picks while B has 10, album A's vote overlap is more impressive. Likewise, if albums A and B have 7 picks each and A has 10 songs and B has 15, album B's vote overlap is more impressive. Overlap becomes less impressive as the number of participants and votes per participant increase."><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.2-2' }}</small>
-
-        <small class="mr-3" title="The ratio of 'bad' to 'good' songs. In other words: for each picked song, how many other songs went unpicked?"><i class="fas fa-theater-masks"></i> {{ unpickedRatio | number : '1.2-2' }}</small>
+        <small class="mr-3" title="Vote overlap percentage. There is 0% overlap if everyone votes for different songs. Likewise, there is 100% overlap if everyone votes for the same number of songs as there are votes per person."><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.0-0' }}%</small>
 
         <small class="mr-3" title="The percentage of liked songs out of the whole album."><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
 
