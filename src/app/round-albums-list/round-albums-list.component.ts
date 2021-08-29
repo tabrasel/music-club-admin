@@ -56,14 +56,8 @@ export class RoundAlbumsListComponent implements OnInit {
     // List all members as poster options
     this.allMembers = [];
     this.modelService.getAllMembers().subscribe(allMembers => {
-      // Sort all members name
-      this.allMembers = allMembers.sort((a, b) => {
-        if (a.lastName < b.lastName)
-          return -1;
-        else if (a.lastName > b.lastName)
-          return 1;
-        return a.firstName < b.firstName ? -1 : 1;
-      });
+      // Sort members by name
+      this.allMembers = allMembers.sort((m1, m2) => this.modelService.compareMembers(m1, m2));
     });
 
     this.albumToUpdateId = null;
@@ -88,13 +82,7 @@ export class RoundAlbumsListComponent implements OnInit {
     // Once all album list items have been created
     Promise.all(albumListItemPromises).then(albumListItems => {
       // Sort the temporary list of album list items by poster name
-      this.albumListItems = albumListItems.sort((a, b) => {
-        if (a.poster.lastName < b.poster.lastName)
-          return -1;
-        else if (a.poster.lastName > b.poster.lastName)
-          return 1;
-        return a.poster.firstName < b.poster.firstName ? -1 : 1;
-      });
+      this.albumListItems = albumListItems.sort((a1, a2) => this.modelService.compareMembers(a1.poster, a2.poster));
     });
   }
 

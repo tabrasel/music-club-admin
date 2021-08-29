@@ -47,16 +47,10 @@ export class RoundInfoComponent implements OnInit {
       return this.modelService.getMember(album.posterId).toPromise();
     });
 
-    // Once all participants have been loaded
+    // Sort participants once all participants have been loaded
     Promise.all(participantPromises).then(participants => {
-      // Sort participant icons by name
-      this.participants = participants.sort((a, b) => {
-        if (a.lastName < b.lastName)
-          return -1;
-        else if (a.lastName > b.lastName)
-          return 1;
-        return a.firstName < b.firstName ? -1 : 1;
-      });
+      // Sort participants by name
+      this.participants = participants.sort((p1, p2) => this.modelService.compareMembers(p1, p2));
     });
   }
 

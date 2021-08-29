@@ -208,4 +208,15 @@ export class ModelService {
     return this.httpClient.get<IMember[]>(this.hostUrl + 'api/members');
   }
 
+  /**
+   * Compares two members by name.
+   */
+  compareMembers(m1: IMember, m2: IMember): number {
+    if (m1.lastName < m2.lastName)
+      return -1;
+    else if (m1.lastName > m2.lastName)
+      return 1;
+    return m1.firstName < m2.firstName ? -1 : 1;
+  }
+
 }
