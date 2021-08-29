@@ -207,6 +207,9 @@ export class RoundsListComponent implements OnInit {
 
   clearRoundForm(): void {
     this.roundForm.reset();
+    this.roundForm.patchValue({
+      picksPerParticipant: 3
+    })
   }
 
 }
