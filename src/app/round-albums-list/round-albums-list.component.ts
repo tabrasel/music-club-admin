@@ -7,6 +7,7 @@ import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
 import { ModelService } from '../model.service';
+import { RoundListItemsService } from '../round-list-items.service';
 
 interface IAlbumForm {
   title: string;
@@ -35,12 +36,12 @@ export class RoundAlbumsListComponent implements OnInit {
   albumToUpdateId: string;
 
   @Input() round: IRound;
-
   @Output() albumSelectEvent = new EventEmitter<IAlbum>();
 
   constructor(
     private formBuilder: FormBuilder,
-    private modelService: ModelService
+    private modelService: ModelService,
+    private roundListItemsService: RoundListItemsService
   ) { }
 
   ngOnInit(): void {
@@ -116,12 +117,29 @@ export class RoundAlbumsListComponent implements OnInit {
 
       // Add the album list item to the list
       this.albumListItems.push(albumListItem);
-
       this.sortAlbumListItems();
+
+      // Add the album image to its corresponding round list item
+      // TODO: Round participants should be added when creating a new round
+      const poster: IMember = await this.modelService.getMember(album.posterId).toPromise();
+      this.roundListItemsService.addParticipant(poster, this.round);
+
+      // Add the album to its round list item
+      this.roundListItemsService.addAlbum(album, this.round);
     } else {
       this.modelService.updateAlbum(this.albumToUpdateId, formValues).subscribe(updatedAlbum => {
-        // TODO: Update the list item for the round
+        // Update the album in its round list item
+        for (let albumListItem of this.albumListItems) {
+          if (albumListItem.album.id === this.albumToUpdateId) {
+            albumListItem.album = updatedAlbum;
+            break;
+          }
+        }
+
         this.sortAlbumListItems();
+
+        // Update the album in its round list item
+        this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
       });
     }
 
@@ -156,6 +174,9 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Remove the album's list item
     this.albumListItems = this.albumListItems.filter(albumListItem => albumListItem.album.id != deletedAlbum.id);
+
+    // Delete the album from its corresponding round list item
+    this.roundListItemsService.deleteAlbum(deletedAlbum, this.round);
   }
 
   clearAlbumForm(): void {

@@ -7,6 +7,7 @@ import { IMember } from '../interfaces/IMember';
 import { IRound } from '../interfaces/IRound';
 
 import { ModelService } from '../model.service';
+import { RoundListItemsService } from '../round-list-items.service';
 
 interface IRoundForm {
   number: number;
@@ -37,7 +38,8 @@ export class RoundsListComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private modelService: ModelService
+    private modelService: ModelService,
+    private roundListItemsService: RoundListItemsService
   ) { }
 
   ngOnInit(): void {
@@ -52,83 +54,8 @@ export class RoundsListComponent implements OnInit {
     this.selectedRound = null;
     this.roundToUpdateId = null;
 
-    /*
-    this.roundViewService.roundListItemsChange.subscribe(roundListItems => {
-      this.roundListItems = roundListItems;
-    });
-    */
-
-    this.roundListItems = [];
-    this.loadRoundListItems();
-  }
-
-  async createRoundListItem(round: IRound): Promise<IRoundListItem> {
-    // Load the albums in the round
-    const albums: IAlbum[] = [];
-    for (let albumId of round.albumIds) {
-      const album: IAlbum = await this.modelService.getAlbum(albumId).toPromise();
-      albums.push(album);
-    }
-
-    // Load the participants in the round
-    const participants: IMember[] = [];
-    const participantPromises: Promise<IMember>[] = [];
-    for (let album of albums) {
-      const participantPromise: Promise<IMember> = this.modelService.getMember(album.posterId).toPromise();
-      participantPromises.push(participantPromise);
-    }
-
-    return Promise.all(participantPromises)
-      .then(participants => {
-        // Sort participants by name
-        participants.sort((a, b) => {
-          if (a.lastName < b.lastName)
-            return -1;
-          else if (a.lastName > b.lastName)
-            return 1;
-          return a.firstName < b.firstName ? -1 : 1;
-        });
-
-        // Sort albums by poster name
-        albums.sort((a, b) => {
-          const aPoster: IMember = participants.filter(participant => participant.id === a.posterId)[0];
-          const bPoster: IMember = participants.filter(participant => participant.id === b.posterId)[0];
-
-          if (aPoster.lastName < bPoster.lastName)
-            return -1;
-          else if (aPoster.lastName > bPoster.lastName)
-            return 1;
-          return aPoster.firstName < bPoster.firstName ? -1 : 1;
-        });
-
-        const roundListItem: IRoundListItem = {
-          round: round,
-          albums: albums,
-          members: participants
-        };
-
-        return roundListItem;
-      })
-      .catch(error => {
-        return null;
-      });
-  }
-
-  async loadRoundListItems(): Promise<void> {
-    const allRounds = await this.modelService.getAllRounds().toPromise();
-
-    const roundListItemPromises: Promise<IRoundListItem>[] = [];
-    for (let round of allRounds) {
-      const roundListItemPromise: Promise<IRoundListItem> = this.createRoundListItem(round);
-      roundListItemPromises.push(roundListItemPromise)
-    }
-
-    Promise.all(roundListItemPromises)
-      .then(roundListItems => {
-        // Sort round list items by descending round number
-        this.roundListItems = roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
-      })
-
+    this.roundListItemsService.loadRoundListItems();
+    this.roundListItemsService.stream.subscribe(roundListItems => this.roundListItems = roundListItems);
   }
 
   submitRoundForm(): void {
