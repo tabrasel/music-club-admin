@@ -21,14 +21,14 @@ export class ModelService {
   // Round model ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Create a new round.
+   * Creates a round.
    */
   createRound(roundInfo: any): Observable<IRound> {
     return this.httpClient.post<any>(this.hostUrl + 'api/round', roundInfo);
   }
 
   /**
-   * Update a round.
+   * Updates a round.
    */
   updateRound(id: string, updatedData: any): Observable<IRound> {
     return this.httpClient.put<IRound>(this.hostUrl + 'api/round?id=' + id, updatedData);
@@ -38,7 +38,7 @@ export class ModelService {
    * Delete a round.
    */
    async deleteRound(roundToDelete: IRound): Promise<Observable<IRound>> {
-    // TODO: Remove the round from its participants' list of participated rounds
+    // Remove the round from its participants' list of participated rounds
     for (let albumId of roundToDelete.albumIds) {
       this.getAlbum(albumId).subscribe(album => {
         this.getMember(album.posterId).subscribe(poster => {
@@ -50,7 +50,7 @@ export class ModelService {
       });
     }
 
-    // TODO: Delete all albums in the round
+    // Delete all albums in the round
     for (let albumId of roundToDelete.albumIds) {
       this.getAlbum(albumId).subscribe(albumToDelete => {
         this.deleteAlbum(albumToDelete, roundToDelete).subscribe();
@@ -62,14 +62,14 @@ export class ModelService {
   }
 
   /**
-   * Get a round.
+   * Gets a round.
    */
   getRound(id: string): Observable<IRound> {
     return this.httpClient.get<IRound>(this.hostUrl + 'api/round?id=' + id);
   }
 
   /**
-   * Get all rounds.
+   * Gets all rounds.
    */
   getAllRounds(): Observable<IRound[]> {
     return this.httpClient.get<IRound[]>(this.hostUrl + 'api/rounds');
@@ -78,7 +78,7 @@ export class ModelService {
   // Album model ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Create a new album.
+   * Creates an album.
    * @param albumInfo information describing the album
    * @param round     the round the album should be posted to
    * @return a new album
@@ -119,14 +119,17 @@ export class ModelService {
   }
 
   /**
-   * Update an album.
+   * Updates an album.
+   * @param id          the id of the album to update
+   * @param updatedData the updated album values
    */
   updateAlbum(id: string, updatedData: any): Observable<IAlbum> {
+    // TODO: Update original and new poster's posted albums
     return this.httpClient.put<IAlbum>(this.hostUrl + 'api/album?id=' + id, updatedData);
   }
 
   /**
-   * Delete an album.
+   * Deletes an album.
    * @param albumToDelete the album to delete
    * @param round         the round the album should be deleted from
    */
@@ -150,7 +153,7 @@ export class ModelService {
   }
 
   /**
-   * Get an album.
+   * Gets an album.
    * @param id ID of the album to get
    */
   getAlbum(id: string): Observable<IAlbum> {
@@ -158,7 +161,7 @@ export class ModelService {
   }
 
   /**
-   * Delete a picked track.
+   * Deletes a picked track.
    */
   deletePickedTrack(pickedTrackToDelete: any, album: IAlbum): void {
     const newData: any = {
@@ -170,7 +173,9 @@ export class ModelService {
   // Member model //////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Create a new member.
+   * Creates a new member.
+   * @param firstName the first name of the new member
+   * @param lastName the last name of the new member
    */
   createMember(firstName: string, lastName: string): Observable<IMember> {
     const memberInfo: any = { firstName: firstName, lastName: lastName };
@@ -178,31 +183,35 @@ export class ModelService {
   }
 
   /**
-   * Update a member.
+   * Updates a member.
+   * @param id      the ID of the member to update
+   * @param newData an object of updated member values
    */
   updateMember(id: string, newData: any): Observable<IMember> {
     return this.httpClient.put<IMember>(this.hostUrl + 'api/member?id=' + id, newData);
   }
 
   /**
-   * Delete a member.
+   * Deletes a member.
+   * @param id the ID of the member to delete
    */
-  deleteMember(memberToDelete: IMember): Observable<IMember> {
+  deleteMember(id: string): Observable<IMember> {
     // TODO: Delete all the member's posted albums and picked track selections
 
     // Delete the member from the database
-    return this.httpClient.delete<IMember>(this.hostUrl + 'api/member?id=' + memberToDelete.id);
+    return this.httpClient.delete<IMember>(this.hostUrl + 'api/member?id=' + id);
   }
 
   /**
-   * Get a member.
+   * Gets a member.
+   * @param id the ID of the member to get.
    */
   getMember(id: string): Observable<IMember> {
     return this.httpClient.get<IMember>(this.hostUrl + 'api/member?id=' + id);
   }
 
   /**
-   * Get all members.
+   * Gets all members.
    */
   getAllMembers(): Observable<IMember[]> {
     return this.httpClient.get<IMember[]>(this.hostUrl + 'api/members');
