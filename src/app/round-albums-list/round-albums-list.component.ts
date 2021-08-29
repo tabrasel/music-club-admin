@@ -175,8 +175,12 @@ export class RoundAlbumsListComponent implements OnInit {
     // Remove the album's list item
     this.albumListItems = this.albumListItems.filter(albumListItem => albumListItem.album.id != deletedAlbum.id);
 
-    // Delete the album from its corresponding round list item
+    // Delete the album from its round list item
     this.roundListItemsService.deleteAlbum(deletedAlbum, this.round);
+
+    // Delete the album's poster from their round list item
+    // TODO: Round participants should be deleted when deleting a round
+    this.roundListItemsService.deleteParticipant(deletedAlbum.posterId, this.round);
   }
 
   clearAlbumForm(): void {

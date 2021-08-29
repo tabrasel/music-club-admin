@@ -136,6 +136,20 @@ export class RoundListItemsService {
   }
 
   /**
+   * Deletes a participant from a round list item.
+   */
+  deleteParticipant(participantId: string, round: IRound): void {
+    const roundListItem: IRoundListItem = this.getRoundListItem(round);
+
+    for (let i = 0; i < roundListItem.members.length; i++) {
+      if (roundListItem.members[i].id === participantId) {
+        roundListItem.members.splice(i, 1);
+        return;
+      }
+    }
+  }
+
+  /**
    * Gets the round list item for the given round.
    */
   getRoundListItem(round: IRound): IRoundListItem {
