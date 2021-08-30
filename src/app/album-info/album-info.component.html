@@ -10,7 +10,7 @@
       </div>
 
       <div class="poster-icon">
-        <p class="m-0" *ngIf="poster !== null">{{ poster.firstName[0] + poster.lastName[0] }}</p>
+        <p class="m-0" *ngIf="poster !== null && poster !== undefined">{{ poster.firstName[0] + poster.lastName[0] }}</p>
       </div>
 
     </header>
@@ -49,12 +49,12 @@
           <div class="picked-track-list-item-overlay">
             <div class="hover-panel p-1">
               <!-- Edit button -->
-              <button class="btn btn-secondary hover-panel-button mr-1" type="button" name="button">
+              <button class="btn btn-secondary hover-panel-button mr-1" type="button" name="button" (click)="populatePickedTrackForm(pickedTrackListItem.pickedTrack)" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
                 <i class="fas fa-edit"></i>
               </button>
 
               <!-- Delete button -->
-              <button class="btn btn-danger hover-panel-button" type="button" name="button" (click)="deletePickedTrack(pickedTrackListItem.pickedTrack)">
+              <button class="btn btn-danger hover-panel-button" type="button" name="button"  (click)="deletePickedTrack(pickedTrackListItem.pickedTrack)">
                 <i class="fas fa-times"></i>
               </button>
 

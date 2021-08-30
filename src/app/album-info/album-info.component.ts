@@ -14,7 +14,7 @@ interface IPickedTrack {
 }
 
 interface IPickedTrackListItem {
-  pickedTrack: any,
+  pickedTrack: IPickedTrack,
   pickers: IMember[]
 }
 
@@ -36,6 +36,7 @@ export class AlbumInfoComponent implements OnInit {
   pickedTrackListItems: any[];
   poster: IMember;
   pickerIdsControl: FormArray;
+  pickedTrackToUpdate: IPickedTrack;
 
   // Album metrics
   concensusScore: number;
@@ -73,7 +74,6 @@ export class AlbumInfoComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
     this.loadPickedTrackListItems();
 
     this.modelService.getMember(this.album.posterId).subscribe(poster => {
@@ -93,7 +93,7 @@ export class AlbumInfoComponent implements OnInit {
     const pickedTracksCount = this.album.pickedTracks.length;
     const participantsCount = this.participants.length;
     const picksPerParticipant = this.round.picksPerParticipant;
-    
+
     this.unpickedRatio = (trackCount - pickedTracksCount) / pickedTracksCount;
     this.coverage = pickedTracksCount / trackCount * 100;
 
@@ -142,58 +142,106 @@ export class AlbumInfoComponent implements OnInit {
     });
   }
 
+  populatePickedTrackForm(pickedTrack: IPickedTrack): void {
+    // Don't click any elements under the edit button
+    event.stopPropagation();
+
+    // Set picked track form values
+    this.pickedTrackForm.controls.title.setValue(pickedTrack.title);
+    this.pickedTrackForm.controls.trackNumber.setValue(pickedTrack.trackNumber);
+    this.pickedTrackForm.controls.isTopTrack.setValue(pickedTrack.trackNumber === this.album.topTrackNumber);
+
+    this.pickerIdsControl.clear();
+    this.participants.forEach(participant => {
+      const checked: boolean = pickedTrack.pickerIds.indexOf(participant.id) !== -1;
+      this.pickerIdsControl.push(new FormControl(checked));
+    });
+
+    this.pickedTrackToUpdate = pickedTrack;
+  }
+
   async submitPickedTrackForm(): Promise<void> {
     const form: IPickedTrackForm = this.pickedTrackForm.value as IPickedTrackForm;
-
-    // TODO: search album in database to see if there was already a picked track with the same track number. This will
-    // ensure that the track number can be used as a unique ID (helpful for deletion). Maybe also warn if there is a
-    // picked track with the same name.
 
     // Set the picked track's pickers
     const selectedPickerIds = this.pickedTrackForm.value.pickerIds
       .map((checked, i) => checked ? this.participants[i].id : null)
       .filter(v => v !== null);
 
-    // Create the picked track in the database
-    const newPickedTrack: IPickedTrack = {
+    // Define the picked track
+    const pickedTrack: IPickedTrack = {
       title: form.title.trim(),
       trackNumber: form.trackNumber,
       pickerIds: selectedPickerIds
     };
 
-    // Abort if the album already has a track with the same track number
-    for (let pickedTrack of this.album.pickedTracks) {
-      if (newPickedTrack.trackNumber === pickedTrack.trackNumber) {
-        alert('The album "' + this.album.title + '" already has a track #' + newPickedTrack.trackNumber);
-        return;
+    if (this.pickedTrackToUpdate === null) {
+      // Abort if the album already has a track with the same track number
+      for (let pickedTrack of this.album.pickedTracks) {
+        if (form.trackNumber === pickedTrack.trackNumber) {
+          alert('The album "' + this.album.title + '" already has a track #' + form.trackNumber);
+          return;
+        }
+      }
+
+      // Update the picked track's album in the database
+      const newAlbumData = {};
+
+      // Add picked track to the selected album
+      this.album.pickedTracks.push(pickedTrack);
+      newAlbumData['pickedTracks'] = this.album.pickedTracks;
+
+      // Set picked track as top track in its album if it's selected
+      if (form.isTopTrack) {
+        this.album.topTrackNumber = form.trackNumber;
+        newAlbumData['topTrackNumber'] = form.trackNumber;
+      }
+
+      this.modelService.updateAlbum(this.album.id, newAlbumData).subscribe();
+
+      // Create a list item for the picked track
+      this.createPickedTrackListItem(pickedTrack)
+        .then(pickedTrackListItem => {
+          // Add the picked track list item to the list
+          this.pickedTrackListItems.push(pickedTrackListItem);
+
+          // Sort picked track list items by track number
+          this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+        });
+    } else {
+      // Update the picked track's album in the database
+      const newAlbumData = {};
+
+      // Update picked track in the selected album
+      for (let i = 0; i < this.album.pickedTracks.length; i++) {
+        if (this.album.pickedTracks[i].trackNumber === this.pickedTrackToUpdate.trackNumber) {
+          this.album.pickedTracks[i] = pickedTrack;
+          break;
+        }
+      }
+      newAlbumData['pickedTracks'] = this.album.pickedTracks;
+
+      // Set picked track as top track in its album if it's selected
+      if (form.isTopTrack) {
+        this.album.topTrackNumber = form.trackNumber;
+        newAlbumData['topTrackNumber'] = form.trackNumber;
+      } else {
+        if (this.album.topTrackNumber === this.pickedTrackToUpdate.trackNumber) {
+          this.album.topTrackNumber = null;
+          newAlbumData['topTrackNumber'] = null;
+        }
+      }
+
+      this.modelService.updateAlbum(this.album.id, newAlbumData).subscribe();
+
+      // Replace picked track's existing list item with a new one
+      for (let i = 0; i < this.pickedTrackListItems.length; i++) {
+        if (this.pickedTrackListItems[i].pickedTrack.trackNumber === this.pickedTrackToUpdate.trackNumber) {
+          this.pickedTrackListItems[i] = await this.createPickedTrackListItem(pickedTrack);
+          break;
+        }
       }
     }
-
-    // Update the picked track's album
-
-    const newAlbumData = {};
-
-    // Add picked track to the selected album
-    this.album.pickedTracks.push(newPickedTrack);
-    newAlbumData['pickedTracks'] = this.album.pickedTracks;
-
-    // Set picked track as top track in its album if it's selected
-    if (form.isTopTrack && form.trackNumber !== this.album.topTrackNumber) {
-      newAlbumData['topTrackNumber'] = form.trackNumber;
-      this.album.topTrackNumber = form.trackNumber;
-    }
-
-    await this.modelService.updateAlbum(this.album.id, newAlbumData).toPromise();
-
-    // Create a list item for the picked track
-    this.createPickedTrackListItem(newPickedTrack)
-      .then(newPickedTrackListItem => {
-        // Add the picked track list item to the list
-        this.pickedTrackListItems.push(newPickedTrackListItem);
-
-        // Sort picked track list items by track number
-        this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
-      });
 
     // Close the picked track form modal
     document.getElementById('picked-track-modal-close-button').click();
@@ -211,12 +259,11 @@ export class AlbumInfoComponent implements OnInit {
 
     if (!confirm('Really delete "' + deletedPickedTrack.title + '"?')) return;
 
-    // TODO: Delete the picked track from its album in the database
+    // Delete the picked track from its album in the database
     await this.modelService.deletePickedTrack(deletedPickedTrack, this.album);
 
     // Remove the picked track's list item
-    // TODO: Either needs a better unique identifier, or
-    this.pickedTrackListItems = this.pickedTrackListItems.filter(pickedTrackListItem => pickedTrackListItem.pickedTrack.trackNumber != deletedPickedTrack.trackNumber);
+    this.pickedTrackListItems = this.pickedTrackListItems.filter(pickedTrackListItem => pickedTrackListItem.pickedTrack.trackNumber !== deletedPickedTrack.trackNumber);
 
     this.calculateMetrics();
   }

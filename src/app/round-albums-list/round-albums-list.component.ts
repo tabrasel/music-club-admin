@@ -140,6 +140,8 @@ export class RoundAlbumsListComponent implements OnInit {
 
         // Update the album in its round list item
         this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
+
+        this.albumToUpdateId = null;
       });
     }
 
@@ -150,6 +152,7 @@ export class RoundAlbumsListComponent implements OnInit {
   }
 
   populateAlbumForm(album: IAlbum): void {
+
     // Don't click any elements under the edit button
     event.stopPropagation();
 
