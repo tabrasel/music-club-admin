@@ -71,6 +71,8 @@ export class AlbumInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.calculateMetrics();
+
+    this.pickedTrackToUpdate = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -241,6 +243,8 @@ export class AlbumInfoComponent implements OnInit {
           break;
         }
       }
+
+      this.pickedTrackToUpdate == null;
     }
 
     // Close the picked track form modal
