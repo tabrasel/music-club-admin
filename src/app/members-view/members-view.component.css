@@ -6,3 +6,16 @@
   background-color: #212529;
   color: white;
 }
+
+.member-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-block;
+  color: white;
+  font-size: 11px;
+  border-radius: 50%;
+}
+
+input[type=color] {
+  display: block;
+}

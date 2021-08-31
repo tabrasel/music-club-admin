@@ -177,8 +177,8 @@ export class ModelService {
    * @param firstName the first name of the new member
    * @param lastName the last name of the new member
    */
-  createMember(firstName: string, lastName: string): Observable<IMember> {
-    const memberInfo: any = { firstName: firstName, lastName: lastName };
+  createMember(firstName: string, lastName: string, color: string): Observable<IMember> {
+    const memberInfo: any = { firstName: firstName, lastName: lastName, color: color };
     return this.httpClient.post<IMember>(this.hostUrl + 'api/member', memberInfo);
   }
 

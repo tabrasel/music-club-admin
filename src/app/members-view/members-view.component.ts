@@ -10,6 +10,7 @@ import { ModelService } from '../model.service';
 interface IMemberForm {
   firstName: string;
   lastName: string;
+  color: string;
 }
 
 interface IMemberListItem {
@@ -35,7 +36,8 @@ export class MembersViewComponent implements OnInit {
     // Define the member form
     this.memberForm = this.formBuilder.group({
       firstName: [null, Validators.required],
-      lastName: [null, Validators.required]
+      lastName: [null, Validators.required],
+      color: [null, Validators.required]
     });
 
     // List all members
@@ -54,7 +56,7 @@ export class MembersViewComponent implements OnInit {
     const form: IMemberForm = this.memberForm.value as IMemberForm;
 
     // Create the member
-    const member: IMember = await this.modelService.createMember(form.firstName, form.lastName).toPromise();
+    const member: IMember = await this.modelService.createMember(form.firstName, form.lastName, form.color).toPromise();
 
     // Create the member list item
     const memberListItem: IMemberListItem = {

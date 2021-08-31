@@ -3,7 +3,7 @@
   <div class="h-100 p-3 col-3 d-flex flex-column">
 
     <!-- Header and add button -->
-    <div class="mb-2 d-flex justify-content-between align-items-center">
+    <div class="mb-3 d-flex justify-content-between align-items-center">
 
       <h2 class="m-0">Members</h2>
 
@@ -15,9 +15,13 @@
 
     <div class="list-group">
 
-      <div class="list-group-item list-group-item-action" *ngFor="let memberListItem of memberListItems">
+      <div class="list-group-item list-group-item-action d-flex" *ngFor="let memberListItem of memberListItems">
 
-        <p>{{ memberListItem.member.firstName }} {{ memberListItem.member.lastName }}</p>
+        <div class="member-icon d-flex justify-content-center align-items-center mr-3" [style.background-color]="memberListItem.member.color">
+          <p class="m-0" *ngIf="picker !== null">{{ memberListItem.member.firstName[0] + memberListItem.member.lastName[0] }}</p>
+        </div>
+
+        <p class="m-0">{{ memberListItem.member.firstName }} {{ memberListItem.member.lastName }}</p>
 
         <!-- TODO: Other info: # participated rounds, first round, latest round, picked track overlaps with other members -->
 
@@ -46,14 +50,25 @@
         <form id="member-form" [formGroup]="memberForm" (ngSubmit)="submitMemberForm()" class="needs-validation">
           <div class="row mb-3">
 
-            <div class="col-6 form-group">
-              <label class="form-label">First name</label>
-              <input type="text" formControlName="firstName" class="form-control form-control-sm" autocomplete="off" required/>
+            <div class="col-7">
+
+              <div class="form-group mb-3">
+                <label class="form-label">First name</label>
+                <input type="text" formControlName="firstName" class="form-control form-control-sm" autocomplete="off" required/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Last name</label>
+                <input type="text" formControlName="lastName" class="form-control form-control-sm" autocomplete="off" required/>
+              </div>
+
             </div>
 
-            <div class="col-6 form-group">
-              <label class="form-label">Last name</label>
-              <input type="text" formControlName="lastName" class="form-control form-control-sm" autocomplete="off" required/>
+            <div class="col-5">
+              <div class="form-group">
+                <label class="form-label">Color</label>
+                <input type="color" formControlName="color">
+              </div>
             </div>
 
           </div>
