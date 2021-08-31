@@ -37,11 +37,11 @@ export class AlbumInfoComponent implements OnInit {
   poster: IMember;
   pickerIdsControl: FormArray;
   pickedTrackToUpdate: IPickedTrack;
+  remainingVotes: number;
 
   // Album metrics
   concensusScore: number;
   coverage: number;
-  unpickedRatio: number;
 
   @Input() album: IAlbum;
   @Input() participants: IMember[];
@@ -96,16 +96,17 @@ export class AlbumInfoComponent implements OnInit {
     const participantsCount = this.participants.length;
     const picksPerParticipant = this.round.picksPerParticipant;
 
-    this.unpickedRatio = (trackCount - pickedTracksCount) / pickedTracksCount;
-    this.coverage = pickedTracksCount / trackCount * 100;
-
-    if (pickedTracksCount < picksPerParticipant) {
-      this.concensusScore = 100;
-    } else if (pickedTracksCount > picksPerParticipant * participantsCount) {
-      this.concensusScore = 0;
-    } else {
-      this.concensusScore = (1 - ((pickedTracksCount - picksPerParticipant) / (picksPerParticipant * participantsCount - picksPerParticipant))) * 100;
+    // Determine how many votes have not been recorded
+    this.remainingVotes = picksPerParticipant * participantsCount;
+    for (let pickedTrack of this.album.pickedTracks) {
+      this.remainingVotes -= pickedTrack.pickerIds.length;
     }
+
+    // Don't calculate metrics if all votes aren't in
+    if (this.remainingVotes !== 0) return;
+
+    this.concensusScore = (1 - ((pickedTracksCount - picksPerParticipant) / (picksPerParticipant * participantsCount - picksPerParticipant))) * 100;
+    this.coverage = pickedTracksCount / trackCount * 100;
   }
 
   async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {

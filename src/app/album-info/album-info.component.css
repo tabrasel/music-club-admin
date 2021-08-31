@@ -82,6 +82,10 @@ h3 {
   align-items: center;
 }
 
+.metrics-warning {
+  color: red;
+}
+
 .picked-track-title {
   font-size: 14px;
 }
