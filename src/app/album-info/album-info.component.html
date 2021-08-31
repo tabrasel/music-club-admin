@@ -9,8 +9,8 @@
         <h4>{{ album.artist }}</h4>
       </div>
 
-      <div class="poster-icon">
-        <p class="m-0" *ngIf="poster !== null && poster !== undefined">{{ poster.firstName[0] + poster.lastName[0] }}</p>
+      <div *ngIf="poster !== null && poster !== undefined" class="poster-icon" [style.background-color]="poster.color">
+        <p class="m-0">{{ poster.firstName[0] + poster.lastName[0] }}</p>
       </div>
 
     </header>
@@ -19,9 +19,12 @@
       <h5 class="m-0">Picked Tracks (of {{ album.trackCount }})</h5>
 
       <div class="">
-        <small class="mr-3" title="Vote overlap percentage. There is 0% overlap if everyone votes for different songs. Likewise, there is 100% overlap if everyone votes for the same number of songs as there are votes per person."><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.0-0' }}%</small>
+        <small class="mr-3 metrics-warning" *ngIf="remainingVotes > 0">Missing {{ remainingVotes }} vote(s)</small>
+        <small class="mr-3 metrics-warning" *ngIf="remainingVotes < 0">Has {{ -remainingVotes }} extra vote(s)</small>
 
-        <small class="mr-3" title="The percentage of liked songs out of the whole album."><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
+        <small class="mr-3" title="Vote overlap percentage. There is 0% overlap if everyone votes for different songs. Likewise, there is 100% overlap if everyone votes for the same number of songs as there are votes per person." *ngIf="remainingVotes === 0"><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.0-0' }}%</small>
+
+        <small class="mr-3" title="The percentage of liked songs out of the whole album." *ngIf="remainingVotes === 0"><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
 
         <button id="add-picked-track-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
           <i class="fas fa-plus"></i>
@@ -39,7 +42,7 @@
             <p class="picked-track-title">{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
 
             <div class="d-flex">
-              <div class="picker-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let picker of pickedTrackListItem.pickers">
+              <div class="picker-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let picker of pickedTrackListItem.pickers" [style.background-color]="picker.color">
                 <p *ngIf="picker !== null">{{ picker.firstName[0] + picker.lastName[0] }}</p>
               </div>
             </div>
