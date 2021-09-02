@@ -245,7 +245,7 @@ export class AlbumInfoComponent implements OnInit {
         }
       }
 
-      this.pickedTrackToUpdate == null;
+      this.pickedTrackToUpdate = null;
     }
 
     // Close the picked track form modal
