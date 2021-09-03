@@ -6,6 +6,8 @@ import { IRound } from '../interfaces/IRound';
 
 import { ModelService } from '../model.service';
 
+import { DateTime } from "luxon";
+
 @Component({
   selector: 'app-round-info',
   templateUrl: './round-info.component.html',
@@ -15,6 +17,9 @@ export class RoundInfoComponent implements OnInit {
 
   selectedAlbum: IAlbum;
   participants: IMember[];
+  startDateStr: any;
+  endDateStr: any;
+  durationStr: any;
 
   @Input() round: IRound;
 
@@ -30,6 +35,15 @@ export class RoundInfoComponent implements OnInit {
     if ('round' in changes) {
       this.selectedAlbum = null;
       this.loadParticipants();
+
+      const startDate = DateTime.fromISO(this.round.startDate);
+      const endDate = DateTime.fromISO(this.round.endDate);
+      this.startDateStr = startDate.toLocaleString(DateTime.DATE_MED);
+      this.endDateStr = endDate.toLocaleString(DateTime.DATE_MED);
+
+      const duration = endDate.diff(startDate, 'days');
+
+      this.durationStr = (duration === 1) ? '1 day' : (duration.days + ' days');
     }
   }
 
