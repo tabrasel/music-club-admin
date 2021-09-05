@@ -2,17 +2,39 @@
   height: 100%;
 }
 
-#foo {
+#album-info {
   box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 15px;
-  /*background-color: green;*/
-}
-
-.picked-track-list-item p {
-  margin: 0px;
 }
 
 h3 {
   font-style: italic;
+}
+
+.poster-icon {
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  color: white;
+  font-size: 20px;
+  border-radius: 50%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.metrics-warning {
+  color: red;
+}
+
+#add-picked-track-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: #212529;
+  color: white;
 }
 
 .scrollable-list-group {
@@ -23,6 +45,10 @@ h3 {
   bottom: 0;
   overflow: auto;
   background-color: whitesmoke;
+}
+
+.list-group-item {
+  padding: 0.4rem 0.6rem;
 }
 
 .picked-track-list-item-overlay {
@@ -55,6 +81,14 @@ h3 {
   color: white;
 }
 
+.picked-track-list-item p {
+  margin: 0px;
+}
+
+.picked-track-title {
+  font-size: 14px;
+}
+
 .picker-icon {
   width: 26px;
   height: 26px;
@@ -64,41 +98,6 @@ h3 {
   border-radius: 50%;
 }
 
-.list-group-item {
-  padding: 0.4rem 0.6rem;
-}
-
-.poster-icon {
-  min-width: 48px;
-  min-height: 48px;
-  max-width: 48px;
-  max-height: 48px;
-  color: white;
-  font-size: 20px;
-  border-radius: 50%;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.metrics-warning {
-  color: red;
-}
-
-.picked-track-title {
-  font-size: 14px;
-}
-
 .top-track {
   background-color: lemonchiffon;
-}
-
-#add-picked-track-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: #212529;
-  color: white;
 }
