@@ -43,6 +43,8 @@ export class MembersViewComponent implements OnInit {
     // List all members
     this.memberListItems = [];
     this.modelService.getAllMembers().subscribe(allMembers => {
+      allMembers.sort((m1, m2) => this.modelService.compareMembers(m1, m2));
+
       for (let member of allMembers) {
         const memberListItem: IMemberListItem = {
           member: member
