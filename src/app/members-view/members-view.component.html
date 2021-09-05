@@ -39,7 +39,7 @@
 
 <!-- Member form modal -->
 <div class="modal fade" id="member-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
 
       <div class="modal-header">
@@ -50,25 +50,23 @@
         <form id="member-form" [formGroup]="memberForm" (ngSubmit)="submitMemberForm()" class="needs-validation">
           <div class="row mb-3">
 
-            <div class="col-7">
+            <div class="col">
 
               <div class="form-group mb-3">
                 <label class="form-label">First name</label>
                 <input type="text" formControlName="firstName" class="form-control form-control-sm" autocomplete="off" required/>
               </div>
 
-              <div class="form-group">
+              <div class="form-group mb-3">
                 <label class="form-label">Last name</label>
                 <input type="text" formControlName="lastName" class="form-control form-control-sm" autocomplete="off" required/>
               </div>
 
-            </div>
-
-            <div class="col-5">
               <div class="form-group">
                 <label class="form-label">Color</label>
-                <input type="color" formControlName="color">
+                <input class="form-control form-control-lg form-control-color" type="color" formControlName="color">
               </div>
+
             </div>
 
           </div>
