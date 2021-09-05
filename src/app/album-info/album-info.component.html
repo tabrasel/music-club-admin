@@ -90,19 +90,19 @@
             <div class="col-6">
 
               <div class="form-group mb-3">
-                <label class="form-label">Title</label>
-                <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required/>
+                <label class="form-label" title="The title of the track.">Title</label>
+                <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required appFocused/>
               </div>
 
               <div class="form-group mb-3">
-                <label class="form-label">Track #</label>
+                <label class="form-label" title="The track number in its album.">Track #</label>
                 <input type="number" formControlName="trackNumber" class="form-control form-control-sm" min="1" required/>
               </div>
 
               <div class="form-group">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" formControlName="isTopTrack">
-                  <label class="form-check-label" for="flexCheckDefault">Is Top Track?</label>
+                  <label class="form-check-label" for="flexCheckDefault" title="Was this the top voted track?">Is Top Track?</label>
                 </div>
               </div>
 
@@ -110,7 +110,7 @@
 
             <div class="col-6">
               <div class="form-group">
-                <label class="form-label">Pickers</label>
+                <label class="form-label" title="The participants who voted for this track.">Pickers</label>
                 <div class="form-check" formArrayName="pickerIds" *ngFor="let control of pickerIdsFormArray.controls; let i = index">
                   <input class="form-check-input" type="checkbox" [formControlName]="i" value="">
                   <label class="form-check-label">{{ participants[i].firstName }} {{ participants[i].lastName }}</label>

@@ -53,31 +53,31 @@
         <form id="album-form" [formGroup]="albumForm" (ngSubmit)="submitAlbumForm()" class="needs-validation">
           <div class="row mb-3">
             <div class="col-6 form-group">
-              <label class="form-label">Title</label>
+              <label class="form-label" title="The title of the album.">Title</label>
               <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required/>
             </div>
 
             <div class="col-6 form-group">
-              <label class="form-label">Artist</label>
+              <label class="form-label" title="The album artist.">Artist</label>
               <input type="text" formControlName="artist" class="form-control form-control-sm" autocomplete="off" required/>
             </div>
           </div>
 
           <div class="row mb-3">
             <div class="col-6 form-group">
-              <label class="form-label"># Tracks</label>
+              <label class="form-label" title="The number of tracks in the album."># Tracks</label>
               <input type="number" formControlName="trackCount" class="form-control form-control-sm" min="1" required/>
             </div>
 
             <div class="col-6 form-group">
-              <label class="form-label">Image URL</label>
+              <label class="form-label" title="The URL for the album cover image.">Image URL</label>
               <input type="text" formControlName="imageUrl" class="form-control form-control-sm" autocomplete="off" required/>
             </div>
           </div>
 
           <div class="row">
             <div class="col-6 form-group">
-              <label class="form-label">Poster</label>
+              <label class="form-label" title="The participant who posted the album.">Poster</label>
               <select formControlName="posterId" class="form-select form-select-sm" aria-label="Default select example" [value]="null" required>
                 <option [value]="null" disabled>Select poster</option>
                 <option [value]="member.id" *ngFor="let member of allMembers">{{ member.firstName }} {{ member.lastName }}</option>
