@@ -99,6 +99,18 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label class="form-label" title="Club members who participated in this round.">Participants</label>
+                <div class="form-check" formArrayName="participantIds" *ngFor="let control of participantIdsFormArray.controls; let i = index">
+                  <input class="form-check-input" type="checkbox" [formControlName]="i" value="">
+                  <label class="form-check-label">{{ clubMembers[i].firstName }} {{ clubMembers[i].lastName }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </form>
       </div>
 

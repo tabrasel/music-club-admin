@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 // Import model interfaces
 import { IAlbum } from '../interfaces/IAlbum';
@@ -33,6 +33,8 @@ export class RoundsListComponent implements OnInit {
   roundListItems: IRoundListItem[];
   selectedRound: IRound;
   roundToUpdateId: string;
+  participantIdsControl: FormArray;
+  clubMembers: IMember[];
 
   @Output() roundSelectEvent = new EventEmitter<IRound>();
 
@@ -40,28 +42,51 @@ export class RoundsListComponent implements OnInit {
     private formBuilder: FormBuilder,
     private modelService: ModelService,
     private roundListItemsService: RoundListItemsService
-  ) { }
+  ) {
+    this.participantIdsControl = new FormArray([]);
 
-  ngOnInit(): void {
     // Define the round form
     this.roundForm = this.formBuilder.group({
 			number: [null, Validators.required],
 			startDate: [null, Validators.required],
       endDate: [null, Validators.required],
+      participantIds: this.participantIdsControl,
       picksPerParticipant: [3, Validators.required]
 		});
+  }
 
+  ngOnInit(): void {
     this.selectedRound = null;
     this.roundToUpdateId = null;
 
     this.roundListItemsService.loadRoundListItems();
     this.roundListItemsService.stream.subscribe(roundListItems => this.roundListItems = roundListItems);
+
+    this.modelService.getAllMembers().subscribe(allMembers => {
+      this.clubMembers = allMembers.sort((m1, m2) => this.modelService.compareMembers(m1, m2));
+
+      this.clubMembers.forEach(clubMember => {
+        this.participantIdsControl.push(new FormControl(false));
+      });
+
+      console.log(this.clubMembers);
+      console.log(this.participantIdsFormArray.controls);
+    });
+  }
+
+  get participantIdsFormArray() {
+    return this.roundForm.controls.participantIds as FormArray;
   }
 
   submitRoundForm(): void {
     const formValues: IRoundForm = this.roundForm.value as IRoundForm;
 
     // TODO: Check if the new round has the same number as an existing round in the database
+
+    // Set the round's participants
+    const selectedParticipantIds = this.roundForm.value.participantIds
+      .map((checked, i) => checked ? this.clubMembers[i].id : null)
+      .filter(v => v !== null);
 
     if (this.roundToUpdateId == null) {
       // Create the round in the database
