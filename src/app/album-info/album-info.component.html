@@ -96,7 +96,7 @@
 
               <div class="form-group mb-3">
                 <label class="form-label" title="The track number in its album.">Track #</label>
-                <input type="number" formControlName="trackNumber" class="form-control form-control-sm" min="1" required/>
+                <input type="number" formControlName="trackNumber" class="form-control form-control-sm" min="1" [max]="album.trackCount" required/>
               </div>
 
               <div class="form-group">

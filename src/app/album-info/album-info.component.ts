@@ -166,6 +166,17 @@ export class AlbumInfoComponent implements OnInit {
   async submitPickedTrackForm(): Promise<void> {
     const form: IPickedTrackForm = this.pickedTrackForm.value as IPickedTrackForm;
 
+    // Abort if track number is invalid
+    if (form.trackNumber < 1) {
+      alert('Track number cannot be less than 1.');
+      return;
+    }
+
+    if (form.trackNumber > this.album.trackCount) {
+      alert('Track number cannot exceed the number of tracks in album "' + this.album.title + '" (' + this.album.trackCount + ' tracks).');
+      return;
+    }
+
     // Set the picked track's pickers
     const selectedPickerIds = this.pickedTrackForm.value.pickerIds
       .map((checked, i) => checked ? this.participants[i].id : null)
@@ -182,7 +193,7 @@ export class AlbumInfoComponent implements OnInit {
       // Abort if the album already has a track with the same track number
       for (let pickedTrack of this.album.pickedTracks) {
         if (form.trackNumber === pickedTrack.trackNumber) {
-          alert('The album "' + this.album.title + '" already has a track #' + form.trackNumber);
+          alert('The album "' + this.album.title + '" already has a track #' + form.trackNumber + '.');
           return;
         }
       }
