@@ -34,15 +34,17 @@ export class RoundInfoComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if ('round' in changes) {
       this.selectedAlbum = null;
+
+      if (this.round === null) return;
+
       this.loadParticipants();
 
       const startDate = DateTime.fromISO(this.round.startDate);
       const endDate = DateTime.fromISO(this.round.endDate);
-      this.startDateStr = startDate.toLocaleString(DateTime.DATE_MED);
-      this.endDateStr = endDate.toLocaleString(DateTime.DATE_MED);
-
       const duration = endDate.diff(startDate, 'days');
 
+      this.startDateStr = startDate.toLocaleString(DateTime.DATE_MED);
+      this.endDateStr = endDate.toLocaleString(DateTime.DATE_MED);
       this.durationStr = (duration === 1) ? '1 day' : (duration.days + ' days');
     }
   }
