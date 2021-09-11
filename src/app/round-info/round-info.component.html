@@ -6,9 +6,15 @@
 
     <div class="d-flex flex-column align-items-end">
 
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center mb-1">
+
+        <div *ngIf="participants.length === 0">
+          <div class="participant-icon participant-icon-blank d-flex justify-content-center align-items-center mr-1"></div>
+        </div>
+
         <div class="participant-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let participant of participants"  [style.background-color]="participant.color">
           <p *ngIf="participant !== null">{{ participant.firstName[0] + participant.lastName[0] }}</p>
+          <p *ngIf="participant === null">NA</p>
         </div>
       </div>
 
