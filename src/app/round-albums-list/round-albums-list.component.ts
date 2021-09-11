@@ -119,11 +119,6 @@ export class RoundAlbumsListComponent implements OnInit {
       this.albumListItems.push(albumListItem);
       this.sortAlbumListItems();
 
-      // Add the album image to its corresponding round list item
-      // TODO: Round participants should be added when creating a new round
-      const poster: IMember = await this.modelService.getMember(album.posterId).toPromise();
-      this.roundListItemsService.addParticipant(poster, this.round);
-
       // Add the album to its round list item
       this.roundListItemsService.addAlbum(album, this.round);
     } else {
@@ -152,7 +147,6 @@ export class RoundAlbumsListComponent implements OnInit {
   }
 
   populateAlbumForm(album: IAlbum): void {
-
     // Don't click any elements under the edit button
     event.stopPropagation();
 
@@ -180,10 +174,6 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Delete the album from its round list item
     this.roundListItemsService.deleteAlbum(deletedAlbum, this.round);
-
-    // Delete the album's poster from their round list item
-    // TODO: Round participants should be deleted when deleting a round
-    this.roundListItemsService.deleteParticipant(deletedAlbum.posterId, this.round);
   }
 
   clearAlbumForm(): void {
