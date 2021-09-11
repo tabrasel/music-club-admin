@@ -68,9 +68,6 @@ export class RoundsListComponent implements OnInit {
       this.clubMembers.forEach(clubMember => {
         this.participantIdsControl.push(new FormControl(false));
       });
-
-      console.log(this.clubMembers);
-      console.log(this.participantIdsFormArray.controls);
     });
   }
 
@@ -88,14 +85,21 @@ export class RoundsListComponent implements OnInit {
       .map((checked, i) => checked ? this.clubMembers[i].id : null)
       .filter(v => v !== null);
 
+    const roundInfo: any = {
+      number: formValues.number,
+      participantIds: selectedParticipantIds,
+      startDate: formValues.startDate,
+      endDate: formValues.endDate
+    };
+
     if (this.roundToUpdateId == null) {
       // Create the round in the database
-      this.modelService.createRound(formValues).subscribe(createdRound => {
+      this.modelService.createRound(roundInfo).subscribe(createdRound => {
         this.addRoundListItem(createdRound);
       });
     } else {
       // Update the round in the database
-      this.modelService.updateRound(this.roundToUpdateId, formValues).subscribe(updatedRound => {
+      this.modelService.updateRound(this.roundToUpdateId, roundInfo).subscribe(updatedRound => {
         // Update the list item for the round
         //this.roundListItems = this.roundListItems.filter(roundListItem => roundListItem.round.id !== roundToDelete.id);
       });
@@ -138,18 +142,29 @@ export class RoundsListComponent implements OnInit {
    * @param round the round to create a list item for
    */
   addRoundListItem(round: IRound): void {
-    // Create a list item for the round
-    const roundListItem: IRoundListItem = {
-      round: round,
-      albums: [],
-      members: []
-    };
+    const participantPromises: Promise<IMember>[] = round.participantIds.map(participantId => {
+      return this.modelService.getMember(participantId).toPromise();
+    });
 
-    // Add the round list item to the list
-    this.roundListItems.push(roundListItem);
+    console.log(participantPromises);
 
-    // Sort round list items by descending round number
-    this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
+
+    Promise.all(participantPromises).then(participants => {
+      console.log(participants);
+
+      // Create a list item for the round
+      const roundListItem: IRoundListItem = {
+        round: round,
+        albums: [],
+        members: participants
+      };
+
+      // Add the round list item to the list
+      this.roundListItems.push(roundListItem);
+
+      // Sort round list items by descending round number
+      this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
+    });
   }
 
   selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
