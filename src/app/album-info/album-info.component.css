@@ -11,12 +11,12 @@ h3 {
 }
 
 .poster-icon {
-  min-width: 48px;
-  min-height: 48px;
-  max-width: 48px;
-  max-height: 48px;
+  min-width: 56px;
+  min-height: 56px;
+  max-width: 56px;
+  max-height: 56px;
   color: white;
-  font-size: 20px;
+  font-size: 24px;
   border-radius: 50%;
   text-align: center;
   display: flex;
