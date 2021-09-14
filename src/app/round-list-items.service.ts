@@ -57,17 +57,9 @@ export class RoundListItemsService {
     }
 
     // Load the participants in the round
-    let participantPromises: Promise<IMember>[] = [];
-    if (round.participantIds.length > 0) {
-      participantPromises = round.participantIds.map(participantId => {
-        return this.modelService.getMember(participantId).toPromise();
-      });
-    } else {
-      participantPromises = albums.map(album => {
-        return this.modelService.getMember(album.posterId).toPromise();
-      });
-    }
-
+    const participantPromises: Promise<IMember>[] = round.participantIds.map(participantId => {
+      return this.modelService.getMember(participantId).toPromise();
+    });
 
     return Promise.all(participantPromises)
       .then(participants => {

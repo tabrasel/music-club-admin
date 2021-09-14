@@ -58,18 +58,9 @@ export class RoundInfoComponent implements OnInit {
 
     this.participants = [];
 
-    let participantPromises: Promise<IMember>[] = [];
-    if (this.round.participantIds.length > 0) {
-      participantPromises = this.round.participantIds.map(participantId => {
-        return this.modelService.getMember(participantId).toPromise();
-      });
-    } else {
-      participantPromises = this.round.albumIds.map(async albumId => {
-        const album: IAlbum = await this.modelService.getAlbum(albumId).toPromise();
-        return this.modelService.getMember(album.posterId).toPromise();
-      });
-    }
-
+    const participantPromises: Promise<IMember>[] = this.round.participantIds.map(participantId => {
+      return this.modelService.getMember(participantId).toPromise();
+    });
 
     // Sort participants once all participants have been loaded
     Promise.all(participantPromises).then(participants => {
