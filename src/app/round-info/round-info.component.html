@@ -28,7 +28,7 @@
   <div class="h-100 flex-grow-1">
     <div class="h-100 row g-0">
       <div class="col-3 h-100">
-        <app-round-albums-list [round]="round" (albumSelectEvent)="selectAlbum($event)"></app-round-albums-list>
+        <app-round-albums-list [round]="round" [participants]="participants" (albumSelectEvent)="selectAlbum($event)"></app-round-albums-list>
       </div>
 
       <div class="col-9 h-100">

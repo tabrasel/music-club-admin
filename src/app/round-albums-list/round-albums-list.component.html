@@ -80,7 +80,7 @@
               <label class="form-label" title="The participant who posted the album.">Poster</label>
               <select formControlName="posterId" class="form-select form-select-sm" aria-label="Default select example" [value]="null" required>
                 <option [value]="null" disabled>Select poster</option>
-                <option [value]="member.id" *ngFor="let member of allMembers">{{ member.firstName }} {{ member.lastName }}</option>
+                <option [value]="participant.id" *ngFor="let participant of participants">{{ participant.firstName }} {{ participant.lastName }}</option>
               </select>
             </div>
           </div>

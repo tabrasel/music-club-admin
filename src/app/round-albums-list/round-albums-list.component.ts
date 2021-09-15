@@ -36,6 +36,7 @@ export class RoundAlbumsListComponent implements OnInit {
   albumToUpdateId: string;
 
   @Input() round: IRound;
+  @Input() participants: IMember[];
   @Output() albumSelectEvent = new EventEmitter<IAlbum>();
 
   constructor(
