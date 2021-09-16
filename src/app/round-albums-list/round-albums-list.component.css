@@ -2,6 +2,10 @@
   height: 100%;
 }
 
+p {
+  margin: 0px;
+}
+
 #add-album-button {
   width: 36px;
   height: 36px;
@@ -62,4 +66,15 @@
   max-height: 96px;
   background-color: lightgray;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px;
+}
+
+.participant-icon {
+  min-width: 26px;
+  min-height: 26px;
+  max-width: 26px;
+  max-height: 26px;
+  display: inline-block;
+  color: white;
+  font-size: 11px;
+  border-radius: 50%;
 }
