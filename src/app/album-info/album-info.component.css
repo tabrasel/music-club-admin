@@ -73,12 +73,13 @@ h3 {
 }
 
 .hover-panel-button {
-  min-width: 28px;
-  min-height: 28px;
-  max-width: 28px;
-  max-height: 28px;
+  min-width: 22px;
+  min-height: 22px;
+  max-width: 22px;
+  max-height: 22px;
   padding: 0px;
   color: white;
+  font-size: 12px;
 }
 
 .picked-track-list-item p {
