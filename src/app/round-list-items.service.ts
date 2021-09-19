@@ -7,10 +7,13 @@ import { IRound } from './interfaces/IRound';
 
 import { ModelService } from './model.service';
 
+import { DateTime } from 'luxon';
+
 interface IRoundListItem {
   round: IRound;
   albums: IAlbum[];
   members: IMember[];
+  startDateStr: string;
 }
 
 @Injectable({
@@ -73,10 +76,14 @@ export class RoundListItemsService {
           return this.modelService.compareMembers(a1Poster, a2Poster);
         });
 
+        const startDate = DateTime.fromISO(round.startDate);
+        const startDateStr: string = startDate.toLocaleString(DateTime.DATE_MED);
+
         const roundListItem: IRoundListItem = {
           round: round,
           albums: albums,
-          members: participants
+          members: participants,
+          startDateStr: startDateStr
         };
 
         return roundListItem;

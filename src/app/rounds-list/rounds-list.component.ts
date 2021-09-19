@@ -9,6 +9,8 @@ import { IRound } from '../interfaces/IRound';
 import { ModelService } from '../model.service';
 import { RoundListItemsService } from '../round-list-items.service';
 
+import { DateTime } from 'luxon';
+
 interface IRoundForm {
   number: number;
   startDate: string;
@@ -20,6 +22,7 @@ interface IRoundListItem {
   round: IRound;
   albums: IAlbum[];
   members: IMember[];
+  startDateStr: string;
 }
 
 @Component({
@@ -146,17 +149,16 @@ export class RoundsListComponent implements OnInit {
       return this.modelService.getMember(participantId).toPromise();
     });
 
-    console.log(participantPromises);
-
-
     Promise.all(participantPromises).then(participants => {
-      console.log(participants);
+      const startDate = DateTime.fromISO(round.startDate);
+      const startDateStr: string = startDate.toLocaleString(DateTime.DATE_MED);
 
       // Create a list item for the round
       const roundListItem: IRoundListItem = {
         round: round,
         albums: [],
-        members: participants
+        members: participants,
+        startDateStr: startDateStr
       };
 
       // Add the round list item to the list
