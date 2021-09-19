@@ -5,8 +5,12 @@
   box-shadow: lightgray 0px 0px 10px;
 }
 
-#foo {
-  z-index: 100;
+#participants-area {
+  height: 142px;
+  padding: 2px 6px;
+  overflow: auto;
+  border: 1px solid #ced4da;
+  border-radius: .2rem;
 }
 
 h1, p {
