@@ -95,3 +95,7 @@ h1, p {
   font-size: 11px;
   border-radius: 50%;
 }
+
+textarea {
+  resize: none;
+}

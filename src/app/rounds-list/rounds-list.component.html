@@ -86,7 +86,7 @@
               <input type="number" formControlName="picksPerParticipant" class="form-control form-control-sm" min="1" required/>
             </div>
           </div>
-          
+
           <div class="row mb-3">
             <div class="col-6">
               <div class="form-group">
@@ -97,6 +97,13 @@
                     <label class="form-check-label">{{ clubMembers[i].firstName }} {{ clubMembers[i].lastName }}</label>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="h-100 form-group d-flex flex-column">
+                <label class="form-label">Description</label>
+                <textarea class="form-control flex-grow-1"></textarea>
               </div>
             </div>
           </div>
