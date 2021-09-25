@@ -13,6 +13,7 @@ import { DateTime } from 'luxon';
 
 interface IRoundForm {
   number: number;
+  description: string;
   startDate: string;
   endDate: string;
   picksPerParticipant: number;
@@ -51,6 +52,7 @@ export class RoundsListComponent implements OnInit {
     // Define the round form
     this.roundForm = this.formBuilder.group({
 			number: [null, Validators.required],
+      description: null,
 			startDate: [null, Validators.required],
       endDate: [null, Validators.required],
       participantIds: this.participantIdsControl,
@@ -90,6 +92,7 @@ export class RoundsListComponent implements OnInit {
 
     const roundInfo: any = {
       number: formValues.number,
+      description: formValues.description,
       participantIds: selectedParticipantIds,
       startDate: formValues.startDate,
       endDate: formValues.endDate
@@ -119,6 +122,7 @@ export class RoundsListComponent implements OnInit {
 
     // Set round form values
     this.roundForm.controls.number.setValue(roundToUpdate.number);
+    this.roundForm.controls.description.setValue(roundToUpdate.description);
     this.roundForm.controls.picksPerParticipant.setValue(roundToUpdate.picksPerParticipant);
     this.roundForm.controls.startDate.setValue(roundToUpdate.startDate);
     this.roundForm.controls.endDate.setValue(roundToUpdate.endDate);
