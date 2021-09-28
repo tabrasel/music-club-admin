@@ -95,7 +95,8 @@ export class RoundsListComponent implements OnInit {
       description: formValues.description,
       participantIds: selectedParticipantIds,
       startDate: formValues.startDate,
-      endDate: formValues.endDate
+      endDate: formValues.endDate,
+      picksPerParticipant: formValues.picksPerParticipant
     };
 
     if (this.roundToUpdateId == null) {
