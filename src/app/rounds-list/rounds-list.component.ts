@@ -128,6 +128,12 @@ export class RoundsListComponent implements OnInit {
     this.roundForm.controls.startDate.setValue(roundToUpdate.startDate);
     this.roundForm.controls.endDate.setValue(roundToUpdate.endDate);
 
+    this.participantIdsControl.clear();
+    this.clubMembers.forEach(member => {
+      const isChecked: boolean = roundToUpdate.participantIds.indexOf(member.id) !== -1;
+      this.participantIdsControl.push(new FormControl(isChecked));
+    });
+
     this.roundToUpdateId = roundToUpdate.id;
   }
 
