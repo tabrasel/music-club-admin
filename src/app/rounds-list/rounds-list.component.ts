@@ -80,7 +80,10 @@ export class RoundsListComponent implements OnInit {
     return this.roundForm.controls.participantIds as FormArray;
   }
 
-  submitRoundForm(): void {
+  /**
+   * Uses form values to either create a new round or update an existing one.
+   */
+  async submitRoundForm(): Promise<void> {
     const formValues: IRoundForm = this.roundForm.value as IRoundForm;
 
     // TODO: Check if the new round has the same number as an existing round in the database
@@ -90,6 +93,7 @@ export class RoundsListComponent implements OnInit {
       .map((checked, i) => checked ? this.clubMembers[i].id : null)
       .filter(v => v !== null);
 
+    // Formatted form values
     const roundInfo: any = {
       number: formValues.number,
       description: formValues.description,
@@ -100,31 +104,53 @@ export class RoundsListComponent implements OnInit {
     };
 
     if (this.roundToUpdateId === null) {
-      // Create the round in the database
-      this.modelService.createRound(roundInfo).subscribe(createdRound => {
-        this.addRoundListItem(createdRound);
-      });
+      this.createRound(roundInfo);
     } else {
-      // Update the round in the database
-      this.modelService.updateRound(this.roundToUpdateId, roundInfo).subscribe(updatedRound => {
-        // Refresh the updated round's info
-        this.selectedRound = updatedRound;
-        this.roundSelectEvent.emit(updatedRound.id);
-
-        /*
-        // TODO: Refresh the updated round's list item
-        this.roundListItems.forEach((roundListItem: any, i: Number) => {
-          if (roundListItem.round.id === this.roundToUpdateId) {
-            this.roundListItems[i] =
-          }
-        });
-        */
-      });
-      this.roundToUpdateId = null;
+      this.updateRound(roundInfo);
     }
 
     // Close the round form modal
     document.getElementById('round-modal-close-button').click();
+  }
+
+  /**
+   * Creates a new round.
+   */
+  async createRound(roundInfo: any): Promise<void> {
+    // Create the round
+    const createdRound: IRound = await this.modelService.createRound(roundInfo).toPromise();
+
+    // Create a round list item for the new round
+    const roundListItem: IRoundListItem = await this.createRoundListItem(createdRound);
+
+    // Add the round list item to the list
+    this.roundListItems.push(roundListItem);
+
+    // Sort round list items by descending round number
+    this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
+  }
+
+  /**
+   * Updates an existing round.
+   */
+  async updateRound(roundInfo: any): Promise<void> {
+    // Update the round
+    const updatedRound: IRound = await this.modelService.updateRound(this.roundToUpdateId, roundInfo).toPromise();
+
+    // Refresh the updated round's info
+    this.selectedRound = updatedRound;
+    this.roundSelectEvent.emit(updatedRound.id);
+
+    /*
+    // TODO: Refresh the updated round's list item
+    this.roundListItems.forEach((roundListItem: any, i: Number) => {
+      if (roundListItem.round.id === this.roundToUpdateId) {
+        this.roundListItems[i] =
+      }
+    });
+    */
+
+    this.roundToUpdateId = null;
   }
 
   populateRoundForm(roundToUpdateId: string): void {
@@ -164,38 +190,35 @@ export class RoundsListComponent implements OnInit {
   }
 
   /**
-   * Add a new round list item to the round list.
-   * @param round the round to create a list item for
+   * Creates a round list item for a given round.
+   * @param round the round to create a round list item for
    */
-  addRoundListItem(round: IRound): void {
+  async createRoundListItem(round: IRound): Promise<any> {
     const participantPromises: Promise<IMember>[] = round.participantIds.map(participantId => {
       return this.modelService.getMember(participantId).toPromise();
     });
 
-    Promise.all(participantPromises).then(participants => {
-      const startDate = DateTime.fromISO(round.startDate);
-      const startDateStr: string = startDate.toLocaleString(DateTime.DATE_MED);
+    // Retreive all round participants at once
+    const participants: IMember[] = await Promise.all(participantPromises);
 
-      // Create a list item for the round
-      const roundListItem: IRoundListItem = {
-        round: round,
-        albums: [],
-        members: participants,
-        startDateStr: startDateStr
-      };
+    // Create a start date label
+    const startDate = DateTime.fromISO(round.startDate);
+    const startDateLabel: string = startDate.toLocaleString(DateTime.DATE_MED);
 
-      // Add the round list item to the list
-      this.roundListItems.push(roundListItem);
+    // Create a list item for the round
+    const roundListItem: IRoundListItem = {
+      round: round,
+      albums: [],
+      members: participants,
+      startDateStr: startDateLabel
+    };
 
-      // Sort round list items by descending round number
-      this.roundListItems = this.roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1);
-    });
+    return Promise.resolve(roundListItem);
   }
 
-  selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
-    this.modelService.getRound(selectedRoundListItem.round.id).subscribe((round: IRound) => {
-      this.selectedRound = round;
-    });
+  async selectRoundListItem(selectedRoundListItem: IRoundListItem): Promise<void> {
+    const round: IRound = await this.modelService.getRound(selectedRoundListItem.round.id).toPromise();
+    this.selectedRound = round;
     this.roundSelectEvent.emit(selectedRoundListItem.round.id);
   }
 
