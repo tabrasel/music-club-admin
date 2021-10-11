@@ -30,8 +30,10 @@ export class RoundsViewComponent implements OnInit {
     this.selectedRound = null;
   }
 
-  selectRound(newSelectedRound: any): void {
-    this.selectedRound = newSelectedRound;
+  selectRound(selectedRoundId: string): void {
+    this.modelService.getRound(selectedRoundId).subscribe((round: IRound) => {
+      this.selectedRound = round;
+    });
   }
 
 }

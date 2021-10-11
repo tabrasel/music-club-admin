@@ -40,7 +40,7 @@ export class RoundsListComponent implements OnInit {
   participantIdsControl: FormArray;
   clubMembers: IMember[];
 
-  @Output() roundSelectEvent = new EventEmitter<IRound>();
+  @Output() roundSelectEvent = new EventEmitter<string>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -99,7 +99,7 @@ export class RoundsListComponent implements OnInit {
       picksPerParticipant: formValues.picksPerParticipant
     };
 
-    if (this.roundToUpdateId == null) {
+    if (this.roundToUpdateId === null) {
       // Create the round in the database
       this.modelService.createRound(roundInfo).subscribe(createdRound => {
         this.addRoundListItem(createdRound);
@@ -107,8 +107,18 @@ export class RoundsListComponent implements OnInit {
     } else {
       // Update the round in the database
       this.modelService.updateRound(this.roundToUpdateId, roundInfo).subscribe(updatedRound => {
-        // Update the list item for the round
-        //this.roundListItems = this.roundListItems.filter(roundListItem => roundListItem.round.id !== roundToDelete.id);
+        // Refresh the updated round's info
+        this.selectedRound = updatedRound;
+        this.roundSelectEvent.emit(updatedRound.id);
+
+        /*
+        // TODO: Refresh the updated round's list item
+        this.roundListItems.forEach((roundListItem: any, i: Number) => {
+          if (roundListItem.round.id === this.roundToUpdateId) {
+            this.roundListItems[i] =
+          }
+        });
+        */
       });
       this.roundToUpdateId = null;
     }
@@ -117,24 +127,26 @@ export class RoundsListComponent implements OnInit {
     document.getElementById('round-modal-close-button').click();
   }
 
-  populateRoundForm(roundToUpdate: IRound): void {
+  populateRoundForm(roundToUpdateId: string): void {
     // Don't click any elements under the edit button
     event.stopPropagation();
 
-    // Set round form values
-    this.roundForm.controls.number.setValue(roundToUpdate.number);
-    this.roundForm.controls.description.setValue(roundToUpdate.description);
-    this.roundForm.controls.picksPerParticipant.setValue(roundToUpdate.picksPerParticipant);
-    this.roundForm.controls.startDate.setValue(roundToUpdate.startDate);
-    this.roundForm.controls.endDate.setValue(roundToUpdate.endDate);
+    this.modelService.getRound(roundToUpdateId).subscribe((roundToUpdate: IRound) => {
+      // Set round form values
+      this.roundForm.controls.number.setValue(roundToUpdate.number);
+      this.roundForm.controls.description.setValue(roundToUpdate.description);
+      this.roundForm.controls.picksPerParticipant.setValue(roundToUpdate.picksPerParticipant);
+      this.roundForm.controls.startDate.setValue(roundToUpdate.startDate);
+      this.roundForm.controls.endDate.setValue(roundToUpdate.endDate);
 
-    this.participantIdsControl.clear();
-    this.clubMembers.forEach(member => {
-      const isChecked: boolean = roundToUpdate.participantIds.indexOf(member.id) !== -1;
-      this.participantIdsControl.push(new FormControl(isChecked));
+      this.participantIdsControl.clear();
+      this.clubMembers.forEach(member => {
+        const isChecked: boolean = roundToUpdate.participantIds.indexOf(member.id) !== -1;
+        this.participantIdsControl.push(new FormControl(isChecked));
+      });
+
+      this.roundToUpdateId = roundToUpdateId;
     });
-
-    this.roundToUpdateId = roundToUpdate.id;
   }
 
   deleteRound(roundToDelete: IRound): void {
@@ -181,8 +193,10 @@ export class RoundsListComponent implements OnInit {
   }
 
   selectRoundListItem(selectedRoundListItem: IRoundListItem): void {
-    this.selectedRound = selectedRoundListItem.round;
-    this.roundSelectEvent.emit(selectedRoundListItem.round);
+    this.modelService.getRound(selectedRoundListItem.round.id).subscribe((round: IRound) => {
+      this.selectedRound = round;
+    });
+    this.roundSelectEvent.emit(selectedRoundListItem.round.id);
   }
 
   clearRoundForm(): void {
