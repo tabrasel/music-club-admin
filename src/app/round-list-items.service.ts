@@ -39,12 +39,11 @@ export class RoundListItemsService {
       return this.createRoundListItem(round);
     });
 
-    // Sort round list items once they are all created
-    Promise.all(roundListItemPromises)
-      .then(roundListItems => {
-        // Sort by descending round number
-        this.source.next(roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1));
-      })
+    // Get round list items
+    const roundListItems: IRoundListItem[] = await Promise.all(roundListItemPromises);
+
+    // Sort items by descending round number
+    this.source.next(roundListItems.sort((a, b) => a.round.number > b.round.number ? -1 : 1));
   }
 
   /**
@@ -52,45 +51,40 @@ export class RoundListItemsService {
    * @param round the round to create a list item for
    */
   async createRoundListItem(round: IRound): Promise<IRoundListItem> {
-    // Load the albums in the round
+    // Load the round albums
     const albums: IAlbum[] = [];
     for (let albumId of round.albumIds) {
       const album: IAlbum = await this.modelService.getAlbum(albumId).toPromise();
       albums.push(album);
     }
 
-    // Load the participants in the round
+    // Get the round participants
     const participantPromises: Promise<IMember>[] = round.participantIds.map(participantId => {
       return this.modelService.getMember(participantId).toPromise();
     });
+    const participants: IMember[] = await Promise.all(participantPromises);
 
-    return Promise.all(participantPromises)
-      .then(participants => {
-        // Sort participants by name
-        participants.sort((p1, p2) => this.modelService.compareMembers(p1, p2));
+    // Sort participants by name
+    participants.sort((p1, p2) => this.modelService.compareMembers(p1, p2));
 
-        // Sort albums by poster name
-        albums.sort((a1, a2) => {
-          const a1Poster: IMember = participants.filter(participant => participant.id === a1.posterId)[0];
-          const a2Poster: IMember = participants.filter(participant => participant.id === a2.posterId)[0];
-          return this.modelService.compareMembers(a1Poster, a2Poster);
-        });
+    // Sort albums by poster name
+    albums.sort((a1, a2) => {
+      const a1Poster: IMember = participants.filter(participant => participant.id === a1.posterId)[0];
+      const a2Poster: IMember = participants.filter(participant => participant.id === a2.posterId)[0];
+      return this.modelService.compareMembers(a1Poster, a2Poster);
+    });
 
-        const startDate = DateTime.fromISO(round.startDate);
-        const startDateStr: string = startDate.toLocaleString(DateTime.DATE_MED);
+    const startDate = DateTime.fromISO(round.startDate);
+    const startDateLabel: string = startDate.toLocaleString(DateTime.DATE_MED);
 
-        const roundListItem: IRoundListItem = {
-          round: round,
-          albums: albums,
-          members: participants,
-          startDateStr: startDateStr
-        };
+    const roundListItem: IRoundListItem = {
+      round: round,
+      albums: albums,
+      members: participants,
+      startDateStr: startDateLabel
+    };
 
-        return roundListItem;
-      })
-      .catch(error => {
-        return null;
-      });
+    return roundListItem;
   }
 
   /**
@@ -154,6 +148,17 @@ export class RoundListItemsService {
         return;
       }
     }
+  }
+
+  /**
+   * Gets the index of the round list item for the given round.
+   */
+  getRoundListItemIndex(round: IRound): number {
+    for (let i = 0; i < this.source.value.length; i++) {
+      const roundListItem = this.source.value[i];
+      if (roundListItem.round.id === round.id) return i;
+    }
+    return -1;
   }
 
   /**

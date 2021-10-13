@@ -141,14 +141,10 @@ export class RoundsListComponent implements OnInit {
     this.selectedRound = updatedRound;
     this.roundSelectEvent.emit(updatedRound.id);
 
-    /*
-    // TODO: Refresh the updated round's list item
-    this.roundListItems.forEach((roundListItem: any, i: Number) => {
-      if (roundListItem.round.id === this.roundToUpdateId) {
-        this.roundListItems[i] =
-      }
-    });
-    */
+    // Replace the round's list item with a new one
+    const index: number = this.roundListItemsService.getRoundListItemIndex(updatedRound);
+    const updatedRoundListItem: IRoundListItem = await this.roundListItemsService.createRoundListItem(updatedRound);
+    this.roundListItems[index] = updatedRoundListItem;
 
     this.roundToUpdateId = null;
   }
