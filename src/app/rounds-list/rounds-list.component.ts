@@ -65,7 +65,10 @@ export class RoundsListComponent implements OnInit {
     this.roundToUpdateId = null;
 
     this.roundListItemsService.loadRoundListItems();
-    this.roundListItemsService.stream.subscribe(roundListItems => this.roundListItems = roundListItems);
+    this.roundListItemsService.stream.subscribe(roundListItems => {
+      this.roundListItems = roundListItems;
+      this.selectRoundListItem(roundListItems[0]);
+    });
 
     this.modelService.getAllMembers().subscribe(allMembers => {
       this.clubMembers = allMembers.sort((m1, m2) => this.modelService.compareMembers(m1, m2));
@@ -213,6 +216,8 @@ export class RoundsListComponent implements OnInit {
   }
 
   async selectRoundListItem(selectedRoundListItem: IRoundListItem): Promise<void> {
+    if (selectedRoundListItem === undefined) return;
+
     const round: IRound = await this.modelService.getRound(selectedRoundListItem.round.id).toPromise();
     this.selectedRound = round;
     this.roundSelectEvent.emit(selectedRoundListItem.round.id);
