@@ -18,7 +18,7 @@
         <div class="d-inline-block position-relative">
           <img class="album-icon" [src]="albumListItem.album.imageUrl" alt="">
 
-          <div class="overlay d-flex justify-content-end align-items-end p-1">
+          <div class="overlay d-flex justify-content-end p-1">
             <div class="participant-icon d-flex justify-content-center align-items-center"  [style.background-color]="albumListItem.poster.color">
               <p *ngIf="albumListItem.poster !== null">{{ albumListItem.poster.firstName[0] + albumListItem.poster.lastName[0] }}</p>
             </div>
