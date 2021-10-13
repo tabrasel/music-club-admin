@@ -125,25 +125,24 @@ export class RoundAlbumsListComponent implements OnInit {
       // Add the album to its round list item
       this.roundListItemsService.addAlbum(album, this.round);
     } else {
-      this.modelService.updateAlbum(this.albumToUpdateId, formValues).subscribe(updatedAlbum => {
-        // Update the album in its round list item
-        for (let albumListItem of this.albumListItems) {
-          if (albumListItem.album.id === this.albumToUpdateId) {
-            albumListItem.album = updatedAlbum;
-            break;
-          }
+      // Update the album in the database
+      const updatedAlbum: IAlbum = await this.modelService.updateAlbum(this.albumToUpdateId, formValues).toPromise();
+
+      // Update the album in its round list item
+      for (let albumListItem of this.albumListItems) {
+        if (albumListItem.album.id === this.albumToUpdateId) {
+          albumListItem.album = updatedAlbum;
+          break;
         }
+      }
 
-        this.sortAlbumListItems();
+      this.sortAlbumListItems();
 
-        // Update the album in its round list item
-        this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
+      // Update the album in its round list item
+      this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
 
-        this.albumToUpdateId = null;
-      });
+      this.albumToUpdateId = null;
     }
-
-    // TODO: Update round list item icon to include album image
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();

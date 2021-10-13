@@ -60,23 +60,24 @@ export class RoundsListComponent implements OnInit {
 		});
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.selectedRound = null;
     this.roundToUpdateId = null;
 
     this.roundListItemsService.loadRoundListItems();
     this.roundListItemsService.stream.subscribe(roundListItems => {
       this.roundListItems = roundListItems;
+
+      // Select the first round
       this.selectRoundListItem(roundListItems[0]);
     });
 
-    this.modelService.getAllMembers().subscribe(allMembers => {
-      this.clubMembers = allMembers.sort((m1, m2) => this.modelService.compareMembers(m1, m2));
+    // Load all club members
+    const allMembers: IMember[] = await this.modelService.getAllMembers().toPromise();
+    this.clubMembers = allMembers.sort((m1, m2) => this.modelService.compareMembers(m1, m2));
 
-      this.clubMembers.forEach(clubMember => {
-        this.participantIdsControl.push(new FormControl(false));
-      });
-    });
+    // Add each club member as a round participant option
+    this.clubMembers.forEach(clubMember => this.participantIdsControl.push(new FormControl(false)));
   }
 
   get participantIdsFormArray() {
