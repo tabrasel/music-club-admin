@@ -81,11 +81,11 @@ export class RoundAlbumsListComponent implements OnInit {
       return this.createAlbumListItem(album);
     });
 
-    // Once all album list items have been created
-    Promise.all(albumListItemPromises).then(albumListItems => {
-      // Sort the temporary list of album list items by poster name
-      this.albumListItems = albumListItems.sort((a1, a2) => this.modelService.compareMembers(a1.poster, a2.poster));
-    });
+    const albumListItems: IAlbumListItem[] = await Promise.all(albumListItemPromises);
+
+    // Sort the temporary list of album list items by poster name
+    this.albumListItems = albumListItems.sort((a1, a2) => this.modelService.compareMembers(a1.poster, a2.poster));
+    this.selectAlbumListItem(albumListItems[0]);
   }
 
   async createAlbumListItem(album: IAlbum): Promise<IAlbumListItem> {
@@ -102,6 +102,8 @@ export class RoundAlbumsListComponent implements OnInit {
   }
 
   selectAlbumListItem(albumListItem: IAlbumListItem): void {
+    if (albumListItem === undefined) return;
+
     this.selectedAlbum = albumListItem.album;
     this.albumSelectEvent.emit(albumListItem.album);
   }
