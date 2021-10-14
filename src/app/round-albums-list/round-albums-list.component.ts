@@ -136,7 +136,12 @@ export class RoundAlbumsListComponent implements OnInit {
         }
       }
 
+      // Sort the album list items in case the update changed the poster name
       this.sortAlbumListItems();
+
+      // Refresh the currently selected album
+      this.selectedAlbum = updatedAlbum;
+      this.albumSelectEvent.emit(updatedAlbum);
 
       // Update the album in its round list item
       this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
