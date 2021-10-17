@@ -40,21 +40,18 @@ export class ModelService {
    async deleteRound(roundToDelete: IRound): Promise<Observable<IRound>> {
     // Remove the round from its participants' list of participated rounds
     for (let albumId of roundToDelete.albumIds) {
-      this.getAlbum(albumId).subscribe(album => {
-        this.getMember(album.posterId).subscribe(poster => {
-          const posterNewData: any = {
-            participatedRoundIds: poster.participatedRoundIds.filter(roundId => roundId !== roundToDelete.id)
-          };
-          this.updateMember(poster.id, posterNewData).subscribe();
-        });
-      });
+
+      const album: IAlbum = await this.getAlbum(albumId).toPromise();
+      const poster: IMember = await this.getMember(album.posterId).toPromise();
+      const posterNewData: any = {
+        participatedRoundIds: poster.participatedRoundIds.filter(roundId => roundId !== roundToDelete.id)
+      };
     }
 
     // Delete all albums in the round
     for (let albumId of roundToDelete.albumIds) {
-      this.getAlbum(albumId).subscribe(albumToDelete => {
-        this.deleteAlbum(albumToDelete, roundToDelete).subscribe();
-      });
+      const albumToDelete: IAlbum = await this.getAlbum(albumId).toPromise();
+      await this.deleteAlbum(albumToDelete, roundToDelete);
     }
 
     // Delete the round from the database
@@ -85,37 +82,26 @@ export class ModelService {
    */
   async createAlbum(albumInfo: any, round: IRound) {
     // Create album in database
-    const newAlbum: IAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
+    const createdAlbum: IAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
 
     // Add album to poster's list of posted albums and add round to the poster's list of participated rounds
-    this.getMember(albumInfo.posterId).subscribe(poster => {
-      poster.participatedRoundIds.push(round.id);
-      poster.postedAlbumIds.push(newAlbum.id);
+    const poster: IMember = await this.getMember(albumInfo.posterId).toPromise();
 
-      const posterNewData = {
-        participatedRoundIds: poster.participatedRoundIds,
-        postedAlbumIds: poster.postedAlbumIds
-      };
+    poster.participatedRoundIds.push(round.id);
+    poster.postedAlbumIds.push(createdAlbum.id);
 
-      this.updateMember(poster.id, posterNewData).subscribe();
-    })
+    const posterNewData = {
+      participatedRoundIds: poster.participatedRoundIds,
+      postedAlbumIds: poster.postedAlbumIds
+    };
+
+    this.updateMember(poster.id, posterNewData).subscribe();
 
     // Add album to its round
-    round.albumIds.push(newAlbum.id);
+    round.albumIds.push(createdAlbum.id);
     this.updateRound(round.id, { albumIds: round.albumIds }).subscribe();
 
-    // TODO: Update the album's round list item to include the album
-    /*
-    const roundListItems: any = this.roundViewService.roundListItems$.value;
-    for (let roundListItem of roundListItems) {
-      if (roundListItem.round.id === round.id) {
-        roundListItem.albums.push(newAlbum);
-        this.roundViewService.roundListItems$.next(roundListItem);
-      }
-    }
-    */
-
-    return newAlbum;
+    return createdAlbum;
   }
 
   /**
@@ -133,7 +119,7 @@ export class ModelService {
    * @param albumToDelete the album to delete
    * @param round         the round the album should be deleted from
    */
-  deleteAlbum(albumToDelete: IAlbum, round: IRound): Observable<IAlbum> {
+  async deleteAlbum(albumToDelete: IAlbum, round: IRound): Promise<Observable<IAlbum>> {
     // Remove the album from the round it was posted in
     const roundNewData: any = {
       albumIds: round.albumIds.filter(albumId => albumId != albumToDelete.id)
@@ -141,12 +127,11 @@ export class ModelService {
     this.updateRound(round.id, roundNewData).subscribe();
 
     // Remove the album from it's poster's list of posted albums
-    this.getMember(albumToDelete.posterId).subscribe(poster => {
-      const posterNewData: any = {
-        postedAlbumIds: poster.postedAlbumIds.filter(albumId => albumId !== albumToDelete.id)
-      };
-      this.updateMember(poster.id, posterNewData).subscribe();
-    });
+    const poster: IMember = await this.getMember(albumToDelete.posterId).toPromise();
+    const posterNewData: any = {
+      postedAlbumIds: poster.postedAlbumIds.filter(albumId => albumId !== albumToDelete.id)
+    };
+    this.updateMember(poster.id, posterNewData).subscribe();
 
     // Delete the album from the database
     return this.httpClient.delete<IAlbum>(this.hostUrl + 'api/album?id=' + albumToDelete.id);

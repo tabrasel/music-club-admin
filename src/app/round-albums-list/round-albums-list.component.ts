@@ -167,14 +167,14 @@ export class RoundAlbumsListComponent implements OnInit {
     this.albumToUpdateId = album.id;
   }
 
-  deleteAlbum(deletedAlbum: IAlbum): void {
+  async deleteAlbum(deletedAlbum: IAlbum): Promise<void> {
     // Don't click any elements under the delete button
     event.stopPropagation();
 
     if (!confirm('Really delete "' + deletedAlbum.title + '"?')) return;
 
     // Delete the album from the database
-    this.modelService.deleteAlbum(deletedAlbum, this.round).subscribe();
+    await this.modelService.deleteAlbum(deletedAlbum, this.round);
 
     // Remove the album's list item
     this.albumListItems = this.albumListItems.filter(albumListItem => albumListItem.album.id != deletedAlbum.id);
