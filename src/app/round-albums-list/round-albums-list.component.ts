@@ -146,6 +146,9 @@ export class RoundAlbumsListComponent implements OnInit {
       // Update the album in its round list item
       this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
 
+      // Update round
+      this.modelService.updateRound(this.round.id, {}).toPromise();
+
       this.albumToUpdateId = null;
     }
 
@@ -181,6 +184,9 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Delete the album from its round list item
     this.roundListItemsService.deleteAlbum(deletedAlbum, this.round);
+
+    // Update round
+    this.modelService.updateRound(this.round.id, {}).toPromise();
   }
 
   clearAlbumForm(): void {
