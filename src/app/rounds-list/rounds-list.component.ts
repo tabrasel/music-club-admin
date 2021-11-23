@@ -22,7 +22,7 @@ interface IRoundForm {
 interface IRoundListItem {
   round: IRound;
   albums: IAlbum[];
-  members: IMember[];
+  participants: IMember[];
   startDateStr: string;
 }
 
@@ -209,7 +209,7 @@ export class RoundsListComponent implements OnInit {
     const roundListItem: IRoundListItem = {
       round: round,
       albums: [],
-      members: participants,
+      participants: participants,
       startDateStr: startDateLabel
     };
 

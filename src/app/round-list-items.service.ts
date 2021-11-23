@@ -12,7 +12,7 @@ import { DateTime } from 'luxon';
 interface IRoundListItem {
   round: IRound;
   albums: IAlbum[];
-  members: IMember[];
+  participants: IMember[];
   startDateStr: string;
 }
 
@@ -80,7 +80,7 @@ export class RoundListItemsService {
     const roundListItem: IRoundListItem = {
       round: round,
       albums: albums,
-      members: participants,
+      participants: participants,
       startDateStr: startDateLabel
     };
 
@@ -95,8 +95,8 @@ export class RoundListItemsService {
 
     roundListItem.albums.push(album);
     roundListItem.albums.sort((a1, a2) => {
-      const a1Poster: IMember = roundListItem.members.filter(participant => participant.id === a1.posterId)[0];
-      const a2Poster: IMember = roundListItem.members.filter(participant => participant.id === a2.posterId)[0];
+      const a1Poster: IMember = roundListItem.participants.filter(participant => participant.id === a1.posterId)[0];
+      const a2Poster: IMember = roundListItem.participants.filter(participant => participant.id === a2.posterId)[0];
       return this.modelService.compareMembers(a1Poster, a2Poster);
     });
   }
@@ -132,8 +132,8 @@ export class RoundListItemsService {
   addParticipant(participant: IMember, round: IRound): void {
     const roundListItem: IRoundListItem = this.getRoundListItem(round);
 
-    roundListItem.members.push(participant);
-    roundListItem.members.sort((p1, p2) => this.modelService.compareMembers(p1, p2));
+    roundListItem.participants.push(participant);
+    roundListItem.participants.sort((p1, p2) => this.modelService.compareMembers(p1, p2));
   }
 
   /**
@@ -142,9 +142,9 @@ export class RoundListItemsService {
   deleteParticipant(participantId: string, round: IRound): void {
     const roundListItem: IRoundListItem = this.getRoundListItem(round);
 
-    for (let i = 0; i < roundListItem.members.length; i++) {
-      if (roundListItem.members[i].id === participantId) {
-        roundListItem.members.splice(i, 1);
+    for (let i = 0; i < roundListItem.participants.length; i++) {
+      if (roundListItem.participants[i].id === participantId) {
+        roundListItem.participants.splice(i, 1);
         return;
       }
     }
