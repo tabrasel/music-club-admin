@@ -103,7 +103,6 @@ export class RoundAlbumsListComponent implements OnInit {
 
   selectAlbumListItem(albumListItem: IAlbumListItem): void {
     if (albumListItem === undefined) return;
-
     this.selectedAlbum = albumListItem.album;
     this.albumSelectEvent.emit(albumListItem.album);
   }
@@ -112,48 +111,56 @@ export class RoundAlbumsListComponent implements OnInit {
     const formValues: IAlbumForm = this.albumForm.value as IAlbumForm;
 
     if (this.albumToUpdateId === null) {
-      // Create the album
-      const album: IAlbum = await this.modelService.createAlbum(formValues, this.round);
-
-      // Create the album list item
-      const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
-
-      // Add the album list item to the list
-      this.albumListItems.push(albumListItem);
-      this.sortAlbumListItems();
-
-      // Add the album to its round list item
-      this.roundListItemsService.addAlbum(album, this.round);
+      this.createAlbum(formValues);
     } else {
-      // Update the album in the database
-      const updatedAlbum: IAlbum = await this.modelService.updateAlbum(this.albumToUpdateId, formValues).toPromise();
-
-      // Update the album in its round list item
-      for (let albumListItem of this.albumListItems) {
-        if (albumListItem.album.id === this.albumToUpdateId) {
-          albumListItem.album = updatedAlbum;
-          break;
-        }
-      }
-
-      // Sort the album list items in case the update changed the poster name
-      this.sortAlbumListItems();
-
-      // Refresh the currently selected album
-      this.selectedAlbum = updatedAlbum;
-      this.albumSelectEvent.emit(updatedAlbum);
-
-      // Update the album in its round list item
-      this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
-
-      // Update round
-      this.modelService.updateRound(this.round.id, {}).toPromise();
-
-      this.albumToUpdateId = null;
+      this.updateAlbum(formValues);
     }
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
+  }
+
+  async createAlbum(albumInfo: any): Promise<void> {
+    // Create the album
+    const album: IAlbum = await this.modelService.createAlbum(albumInfo, this.round);
+
+    // Create the album list item
+    const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
+
+    // Add the album list item to the list
+    this.albumListItems.push(albumListItem);
+    this.sortAlbumListItems();
+
+    // Add the album to its round list item
+    this.roundListItemsService.addAlbum(album, this.round);
+  }
+
+  async updateAlbum(albumInfo: any): Promise<void> {
+    // Update the album in the database
+    const updatedAlbum: IAlbum = await this.modelService.updateAlbum(this.albumToUpdateId, albumInfo).toPromise();
+
+    // Update the album in its round list item
+    for (let albumListItem of this.albumListItems) {
+      if (albumListItem.album.id === this.albumToUpdateId) {
+        albumListItem.album = updatedAlbum;
+        break;
+      }
+    }
+
+    // Sort the album list items in case the update changed the poster name
+    this.sortAlbumListItems();
+
+    // Refresh the currently selected album
+    this.selectedAlbum = updatedAlbum;
+    this.albumSelectEvent.emit(updatedAlbum);
+
+    // Update the album in its round list item
+    this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
+
+    // Update round
+    this.modelService.updateRound(this.round.id, {}).toPromise();
+
+    this.albumToUpdateId = null;
   }
 
   populateAlbumForm(album: IAlbum): void {
