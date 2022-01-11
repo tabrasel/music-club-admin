@@ -11,8 +11,8 @@ import { IRound } from './interfaces/IRound';
 })
 export class ModelService {
 
-  hostUrl: string = 'http://localhost:80/'; // Use when running Angular app locally
-  //hostUrl: string = '/'; // Use when running Angular app remotely
+  hostUrl: string = 'http://localhost:80/'; // Use when running backend service locally
+  //hostUrl: string = 'https://tb-music-club.herokuapp.com/'; // Use when running backend service remotely
 
   constructor(
     private httpClient: HttpClient

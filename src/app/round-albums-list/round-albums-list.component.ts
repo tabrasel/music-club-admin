@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 // Import model interfaces
 import { IAlbum } from '../interfaces/IAlbum';
@@ -10,10 +11,7 @@ import { ModelService } from '../model.service';
 import { RoundListItemsService } from '../round-list-items.service';
 
 interface IAlbumForm {
-  title: string;
-  artist: string;
-  trackCount: number;
-  imageUrl: string;
+  albumQuery: string;
   posterId: string;
 }
 
@@ -29,11 +27,13 @@ interface IAlbumListItem {
 })
 export class RoundAlbumsListComponent implements OnInit {
 
+  albumSearchForm: FormGroup;
   albumForm: FormGroup;
   albumListItems: IAlbumListItem[];
   selectedAlbum: IAlbum;
   allMembers: IMember[];
   albumToUpdateId: string;
+  searchAlbumListItems: any[];
 
   @Input() round: IRound;
   @Input() participants: IMember[];
@@ -42,16 +42,19 @@ export class RoundAlbumsListComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private modelService: ModelService,
-    private roundListItemsService: RoundListItemsService
+    private roundListItemsService: RoundListItemsService,
+    private httpClient: HttpClient
   ) { }
 
   ngOnInit(): void {
+    // Define the album search form
+    this.albumSearchForm = this.formBuilder.group({
+      query: [null, Validators.required]
+    });
+
     // Define the album form
     this.albumForm = this.formBuilder.group({
-      title: [null, Validators.required],
-      artist: [null, Validators.required],
-      trackCount: [null, Validators.required],
-      imageUrl: [null, Validators.required],
+      albumQuery: [null, Validators.required],
       posterId: [null, Validators.required]
     });
 
@@ -63,6 +66,10 @@ export class RoundAlbumsListComponent implements OnInit {
     });
 
     this.albumToUpdateId = null;
+
+    this.albumForm.get('albumQuery').valueChanges.subscribe((query) => {
+      this.searchForAlbum(query);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -118,6 +125,12 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
+  }
+
+  async searchForAlbum(query: string): Promise<any> {
+    const searchResults = await this.httpClient.get<any>(`http://localhost:80/api/album-search?q=${query}`).toPromise();
+    this.searchAlbumListItems = (searchResults.items.length > 0) ? searchResults.items : [];
+    console.log(searchResults);
   }
 
   async createAlbum(albumInfo: any): Promise<void> {

@@ -79,3 +79,38 @@ p {
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 4px;
 }
+
+#search-results-list {
+  height: 250px;
+  background-color: whitesmoke;
+  overflow: auto;
+}
+
+.search-result-list-item img {
+  min-width: 48px;
+  min-height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+}
+
+.search-result-list-item h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 375px;
+}
+
+.search-result-list-item h2 {
+  margin: 0;
+  font-size: 12px;
+}
+
+.search-result-list-item small {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
