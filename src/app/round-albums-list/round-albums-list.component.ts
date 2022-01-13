@@ -11,7 +11,13 @@ import { ModelService } from '../model.service';
 import { RoundListItemsService } from '../round-list-items.service';
 
 interface IAlbumForm {
-  albumQuery: string;
+  albumSearchQuery: string;
+  title: string;
+  artists: string[];
+  artistGenres: string[];
+  trackCount: number;
+  releaseDate: string;
+  imageUrl: string;
   posterId: string;
 }
 
@@ -35,6 +41,9 @@ export class RoundAlbumsListComponent implements OnInit {
   albumToUpdateId: string;
   searchAlbumListItems: any[];
 
+  selectedAlbumSearchResultSpotifyId: string;
+
+
   @Input() round: IRound;
   @Input() participants: IMember[];
   @Output() albumSelectEvent = new EventEmitter<IAlbum>();
@@ -47,15 +56,16 @@ export class RoundAlbumsListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Define the album search form
-    this.albumSearchForm = this.formBuilder.group({
-      query: [null, Validators.required]
-    });
-
     // Define the album form
     this.albumForm = this.formBuilder.group({
-      albumQuery: [null, Validators.required],
-      posterId: [null, Validators.required]
+      albumSearchQuery: [null],
+      title:            [null, Validators.required],
+      artists:          [null, Validators.required],
+      artistGenres:     [null],
+      trackCount:       [null, Validators.required],
+      releaseDate:      [null, Validators.required],
+      imageUrl:         [null, Validators.required],
+      posterId:         [null, Validators.required]
     });
 
     // List all members as poster options
@@ -67,7 +77,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
     this.albumToUpdateId = null;
 
-    this.albumForm.get('albumQuery').valueChanges.subscribe((query) => {
+    this.albumForm.get('albumSearchQuery').valueChanges.subscribe((query) => {
       this.searchForAlbum(query);
     });
   }
@@ -114,6 +124,34 @@ export class RoundAlbumsListComponent implements OnInit {
     this.albumSelectEvent.emit(albumListItem.album);
   }
 
+  async searchForAlbum(query: string): Promise<any> {
+    const searchResults = await this.httpClient.get<any>(`http://localhost:80/api/album-search?q=${query}`).toPromise();
+    this.searchAlbumListItems = (searchResults.items.length > 0) ? searchResults.items : [];
+  }
+
+  async selectAlbumSearchResult(album: any) {
+    // Auto-fill album form
+    this.selectedAlbumSearchResultSpotifyId = album.id;
+    //this.albumForm.controls.albumSearchQuery.setValue(album.name);
+
+    this.albumForm.controls.title.setValue(album.name);
+    this.albumForm.controls.trackCount.setValue(album.total_tracks);
+    this.albumForm.controls.releaseDate.setValue(album.release_date);
+    this.albumForm.controls.imageUrl.setValue(album.images[1].url);
+
+    let artists: string[] = [];
+    let artistGenres: string[] = [];
+
+    for (let artist of album.artists) {
+      artists.push(artist.name);
+      const artistData = await this.httpClient.get<any>(`http://localhost:80/api/artist?id=${artist.id}`).toPromise();
+      artistGenres.push(...artistData.genres);
+    }
+
+    this.albumForm.controls.artists.setValue(artists);
+    this.albumForm.controls.artistGenres.setValue(artistGenres);
+  }
+
   async submitAlbumForm(): Promise<void> {
     const formValues: IAlbumForm = this.albumForm.value as IAlbumForm;
 
@@ -125,12 +163,6 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
-  }
-
-  async searchForAlbum(query: string): Promise<any> {
-    const searchResults = await this.httpClient.get<any>(`http://localhost:80/api/album-search?q=${query}`).toPromise();
-    this.searchAlbumListItems = (searchResults.items.length > 0) ? searchResults.items : [];
-    console.log(searchResults);
   }
 
   async createAlbum(albumInfo: any): Promise<void> {
@@ -182,7 +214,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
     // Set album form values
     this.albumForm.controls.title.setValue(album.title);
-    this.albumForm.controls.artist.setValue(album.artist);
+    this.albumForm.controls.artists.setValue(album.artists);
     this.albumForm.controls.trackCount.setValue(album.trackCount);
     this.albumForm.controls.imageUrl.setValue(album.imageUrl);
     this.albumForm.controls.posterId.setValue(album.posterId);
