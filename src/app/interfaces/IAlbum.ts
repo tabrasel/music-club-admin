@@ -1,8 +1,10 @@
 export interface IAlbum {
   id: string;
   title: string;
-  artist: string;
+  artists: string[];
+  artistGenres: string[];
   trackCount: number;
+  releaseDate: string;
   imageUrl: string;
   posterId: string;
   pickedTracks: {
