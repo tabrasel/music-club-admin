@@ -144,49 +144,53 @@ export class RoundAlbumsListComponent implements OnInit {
       artistGenres.push(...artistData.genres);
     }
 
-    // Get album tracks
-    let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}`).toPromise();
+    try {
+      // Get album tracks
+      let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}dsfhajsd`).toPromise();
 
-    const trackPromises = tracksResult.items.map(async (track) => {
-      const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
+      const trackPromises = tracksResult.items.map(async (track) => {
+        const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
 
-      const timeSignature: string = audioFeaturesResult.time_signature + '/4';
-      const mode: string = (audioFeaturesResult.mode === 1) ? 'major' : 'minor';
-      const key: string = (audioFeaturesResult.key === -1) ? 'N/A' : this.pitchNotations[0];
+        const timeSignature: string = audioFeaturesResult.time_signature + '/4';
+        const mode: string = (audioFeaturesResult.mode === 1) ? 'major' : 'minor';
+        const key: string = (audioFeaturesResult.key === -1) ? 'N/A' : this.pitchNotations[0];
 
-      return Promise.resolve({
-        title:              track.name,
-        diskNumber:         track.disc_number,
-        trackNumber:        track.track_number,
-        duration:           track.duration_ms,
-        audioFeatures: {
-          tempo:            audioFeaturesResult.tempo,
-          timeSignature:    timeSignature,
-          key:              key,
-          mode:             mode,
-          acousticness:     audioFeaturesResult.acousticness,
-          energy:           audioFeaturesResult.energy,
-          danceability:     audioFeaturesResult.danceability,
-          instrumentalness: audioFeaturesResult.instrumentalness,
-          liveness:         audioFeaturesResult.liveness,
-          speechiness:      audioFeaturesResult.speechiness,
-          valence:          audioFeaturesResult.valence
-        },
-        pickerIds: []
+        return Promise.resolve({
+          title:              track.name,
+          diskNumber:         track.disc_number,
+          trackNumber:        track.track_number,
+          duration:           track.duration_ms,
+          audioFeatures: {
+            tempo:            audioFeaturesResult.tempo,
+            timeSignature:    timeSignature,
+            key:              key,
+            mode:             mode,
+            acousticness:     audioFeaturesResult.acousticness,
+            energy:           audioFeaturesResult.energy,
+            danceability:     audioFeaturesResult.danceability,
+            instrumentalness: audioFeaturesResult.instrumentalness,
+            liveness:         audioFeaturesResult.liveness,
+            speechiness:      audioFeaturesResult.speechiness,
+            valence:          audioFeaturesResult.valence
+          },
+          pickerIds: []
+        });
       });
-    });
 
-    const tracks = await Promise.all(trackPromises);
+      const tracks = await Promise.all(trackPromises);
 
-    // Populate form with album data
-    this.albumForm.controls.spotifyId.setValue(spotifyAlbum.id);
-    this.albumForm.controls.title.setValue(spotifyAlbum.name);
-    this.albumForm.controls.trackCount.setValue(spotifyAlbum.total_tracks);
-    this.albumForm.controls.releaseDate.setValue(spotifyAlbum.release_date);
-    this.albumForm.controls.imageUrl.setValue(spotifyAlbum.images[1].url);
-    this.albumForm.controls.artists.setValue(artists);
-    this.albumForm.controls.artistGenres.setValue(artistGenres);
-    this.albumForm.controls.tracks.setValue(tracks);
+      // Populate form with album data
+      this.albumForm.controls.spotifyId.setValue(spotifyAlbum.id);
+      this.albumForm.controls.title.setValue(spotifyAlbum.name);
+      this.albumForm.controls.trackCount.setValue(spotifyAlbum.total_tracks);
+      this.albumForm.controls.releaseDate.setValue(spotifyAlbum.release_date);
+      this.albumForm.controls.imageUrl.setValue(spotifyAlbum.images[1].url);
+      this.albumForm.controls.artists.setValue(artists);
+      this.albumForm.controls.artistGenres.setValue(artistGenres);
+      this.albumForm.controls.tracks.setValue(tracks);
+    } catch(err: any) {
+      alert(`${err.status} ${err.statusText}:\nCould not load data for '${spotifyAlbum.name}'`);
+    }
   }
 
   async submitAlbumForm(): Promise<void> {
