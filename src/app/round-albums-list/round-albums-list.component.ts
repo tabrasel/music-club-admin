@@ -43,6 +43,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
   selectedAlbumSearchResultSpotifyId: string;
 
+  pitchNotations: string[] = ['C', 'C♯/D♭', 'D', 'D♯/E♭', 'E', 'F', 'F♯/G♭', 'G', 'G♯/A♭', 'A', 'A♯/B♭', 'B'];
 
   @Input() round: IRound;
   @Input() participants: IMember[];
@@ -59,12 +60,14 @@ export class RoundAlbumsListComponent implements OnInit {
     // Define the album form
     this.albumForm = this.formBuilder.group({
       albumSearchQuery: [null],
+      spotifyId:        [null, Validators.required],
       title:            [null, Validators.required],
       artists:          [null, Validators.required],
       artistGenres:     [null],
-      trackCount:       [null, Validators.required],
       releaseDate:      [null, Validators.required],
       imageUrl:         [null, Validators.required],
+      trackCount:       [null, Validators.required],
+      tracks:           [null, Validators.required],
       posterId:         [null, Validators.required]
     });
 
@@ -129,27 +132,65 @@ export class RoundAlbumsListComponent implements OnInit {
     this.searchAlbumListItems = (searchResults.items.length > 0) ? searchResults.items : [];
   }
 
-  async selectAlbumSearchResult(album: any) {
-    // Auto-fill album form
-    this.selectedAlbumSearchResultSpotifyId = album.id;
-    //this.albumForm.controls.albumSearchQuery.setValue(album.name);
+  async selectAlbumSearchResult(spotifyAlbum: any) {
+    this.selectedAlbumSearchResultSpotifyId = spotifyAlbum.id;
 
-    this.albumForm.controls.title.setValue(album.name);
-    this.albumForm.controls.trackCount.setValue(album.total_tracks);
-    this.albumForm.controls.releaseDate.setValue(album.release_date);
-    this.albumForm.controls.imageUrl.setValue(album.images[1].url);
-
+    // Get album artists and their associated genres
     let artists: string[] = [];
     let artistGenres: string[] = [];
-
-    for (let artist of album.artists) {
-      artists.push(artist.name);
+    for (let artist of spotifyAlbum.artists) {
       const artistData = await this.httpClient.get<any>(`http://localhost:80/api/artist?id=${artist.id}`).toPromise();
+      artists.push(artist.name);
       artistGenres.push(...artistData.genres);
     }
 
-    this.albumForm.controls.artists.setValue(artists);
-    this.albumForm.controls.artistGenres.setValue(artistGenres);
+    try {
+      // Get album tracks
+      let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}`).toPromise();
+
+      const trackPromises = tracksResult.items.map(async (track) => {
+        const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
+
+        const timeSignature: string = audioFeaturesResult.time_signature + '/4';
+        const mode: string = (audioFeaturesResult.mode === 1) ? 'major' : 'minor';
+        const key: string = (audioFeaturesResult.key === -1) ? 'N/A' : this.pitchNotations[0];
+
+        return Promise.resolve({
+          title:              track.name,
+          diskNumber:         track.disc_number,
+          trackNumber:        track.track_number,
+          duration:           track.duration_ms,
+          audioFeatures: {
+            tempo:            audioFeaturesResult.tempo,
+            timeSignature:    timeSignature,
+            key:              key,
+            mode:             mode,
+            acousticness:     audioFeaturesResult.acousticness,
+            energy:           audioFeaturesResult.energy,
+            danceability:     audioFeaturesResult.danceability,
+            instrumentalness: audioFeaturesResult.instrumentalness,
+            liveness:         audioFeaturesResult.liveness,
+            speechiness:      audioFeaturesResult.speechiness,
+            valence:          audioFeaturesResult.valence
+          },
+          pickerIds: []
+        });
+      });
+
+      const tracks = await Promise.all(trackPromises);
+
+      // Populate form with album data
+      this.albumForm.controls.spotifyId.setValue(spotifyAlbum.id);
+      this.albumForm.controls.title.setValue(spotifyAlbum.name);
+      this.albumForm.controls.trackCount.setValue(spotifyAlbum.total_tracks);
+      this.albumForm.controls.releaseDate.setValue(spotifyAlbum.release_date);
+      this.albumForm.controls.imageUrl.setValue(spotifyAlbum.images[1].url);
+      this.albumForm.controls.artists.setValue(artists);
+      this.albumForm.controls.artistGenres.setValue(artistGenres);
+      this.albumForm.controls.tracks.setValue(tracks);
+    } catch(err: any) {
+      alert(`${err.status} ${err.statusText}:\nCould not load data for '${spotifyAlbum.name}'`);
+    }
   }
 
   async submitAlbumForm(): Promise<void> {
