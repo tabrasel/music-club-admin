@@ -146,7 +146,7 @@ export class RoundAlbumsListComponent implements OnInit {
 
     try {
       // Get album tracks
-      let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}dsfhajsd`).toPromise();
+      let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}`).toPromise();
 
       const trackPromises = tracksResult.items.map(async (track) => {
         const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
