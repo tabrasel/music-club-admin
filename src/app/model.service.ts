@@ -119,7 +119,7 @@ export class ModelService {
    * @param albumToDelete the album to delete
    * @param round         the round the album should be deleted from
    */
-  async deleteAlbum(albumToDelete: IAlbum, round: IRound): Promise<Observable<IAlbum>> {
+  async deleteAlbum(albumToDelete: IAlbum, round: IRound): Promise<IAlbum> {
     // Remove the album from the round it was posted in
     const roundNewData: any = {
       albumIds: round.albumIds.filter(albumId => albumId != albumToDelete.id)
@@ -133,8 +133,8 @@ export class ModelService {
     };
     this.updateMember(poster.id, posterNewData).subscribe();
 
-    // Delete the album from the database
-    return this.httpClient.delete<IAlbum>(this.hostUrl + 'api/album?id=' + albumToDelete.id);
+    // Delete the album from the database    
+    return this.httpClient.delete<IAlbum>(`${this.hostUrl}api/album?id=${albumToDelete.id}`).toPromise();
   }
 
   /**
