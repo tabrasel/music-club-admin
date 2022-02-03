@@ -202,6 +202,10 @@ export class RoundAlbumsListComponent implements OnInit {
       this.updateAlbum(formValues);
     }
 
+    // Clear album search results
+    this.searchAlbumListItems = [];
+    this.selectedAlbumSearchResultSpotifyId = null;
+
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
   }
@@ -284,6 +288,10 @@ export class RoundAlbumsListComponent implements OnInit {
 
   clearAlbumForm(): void {
     this.albumForm.reset();
+
+    // Clear album search results
+    this.searchAlbumListItems = [];
+    this.selectedAlbumSearchResultSpotifyId = null;
   }
 
   sortAlbumListItems(): void {
