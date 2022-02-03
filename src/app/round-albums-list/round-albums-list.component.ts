@@ -132,7 +132,11 @@ export class RoundAlbumsListComponent implements OnInit {
     this.searchAlbumListItems = (searchResults.items.length > 0) ? searchResults.items : [];
   }
 
-  async selectAlbumSearchResult(spotifyAlbum: any) {
+  /**
+   * Upon selecting an album search result.
+   * @param spotifyAlbum item from a Spotify album search result
+   */
+  async selectAlbumSearchResult(spotifyAlbum: any): Promise<void> {
     this.selectedAlbumSearchResultSpotifyId = spotifyAlbum.id;
 
     // Get album artists and their associated genres
@@ -149,18 +153,16 @@ export class RoundAlbumsListComponent implements OnInit {
       let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}`).toPromise();
 
       const trackPromises = tracksResult.items.map(async (track) => {
-        const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
+        let audioFeatures: any = null;
 
-        const timeSignature: string = audioFeaturesResult.time_signature + '/4';
-        const mode: string = (audioFeaturesResult.mode === 1) ? 'major' : 'minor';
-        const key: string = (audioFeaturesResult.key === -1) ? 'N/A' : this.pitchNotations[0];
+        try {
+          const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
 
-        return Promise.resolve({
-          title:              track.name,
-          diskNumber:         track.disc_number,
-          trackNumber:        track.track_number,
-          duration:           track.duration_ms,
-          audioFeatures: {
+          const timeSignature: string = audioFeaturesResult.time_signature + '/4';
+          const mode: string = (audioFeaturesResult.mode === 1) ? 'major' : 'minor';
+          const key: string = (audioFeaturesResult.key === -1) ? 'N/A' : this.pitchNotations[0];
+
+          audioFeatures = {
             tempo:            audioFeaturesResult.tempo,
             timeSignature:    timeSignature,
             key:              key,
@@ -172,7 +174,15 @@ export class RoundAlbumsListComponent implements OnInit {
             liveness:         audioFeaturesResult.liveness,
             speechiness:      audioFeaturesResult.speechiness,
             valence:          audioFeaturesResult.valence
-          },
+          };
+        } catch (err: any) { }
+
+        return Promise.resolve({
+          title:              track.name,
+          diskNumber:         track.disc_number,
+          trackNumber:        track.track_number,
+          duration:           track.duration_ms,
+          audioFeatures:      audioFeatures,
           pickerIds: []
         });
       });
