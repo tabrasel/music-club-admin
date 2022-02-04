@@ -1,5 +1,6 @@
 export interface IAlbum {
   id: string;
+  spotifyId: string;
   title: string;
   artists: string[];
   artistGenres: string[];
@@ -12,5 +13,7 @@ export interface IAlbum {
     trackNumber: number;
     pickerIds: string[];
   }[];
+  tracks: any[];
+  topDiskNumber: number;
   topTrackNumber: number;
 }

@@ -12,12 +12,7 @@ import { RoundListItemsService } from '../round-list-items.service';
 
 interface IAlbumForm {
   albumSearchQuery: string;
-  title: string;
-  artists: string[];
-  artistGenres: string[];
-  trackCount: number;
-  releaseDate: string;
-  imageUrl: string;
+  spotifyId: string;
   posterId: string;
 }
 
@@ -33,17 +28,14 @@ interface IAlbumListItem {
 })
 export class RoundAlbumsListComponent implements OnInit {
 
-  albumSearchForm: FormGroup;
   albumForm: FormGroup;
   albumListItems: IAlbumListItem[];
   selectedAlbum: IAlbum;
   allMembers: IMember[];
   albumToUpdateId: string;
-  searchAlbumListItems: any[];
 
-  selectedAlbumSearchResultSpotifyId: string;
-
-  pitchNotations: string[] = ['C', 'C♯/D♭', 'D', 'D♯/E♭', 'E', 'F', 'F♯/G♭', 'G', 'G♯/A♭', 'A', 'A♯/B♭', 'B'];
+  albumSearchQuery: string;
+  albumSearchListItems: any[];
 
   @Input() round: IRound;
   @Input() participants: IMember[];
@@ -61,13 +53,6 @@ export class RoundAlbumsListComponent implements OnInit {
     this.albumForm = this.formBuilder.group({
       albumSearchQuery: [null],
       spotifyId:        [null, Validators.required],
-      title:            [null, Validators.required],
-      artists:          [null, Validators.required],
-      artistGenres:     [null],
-      releaseDate:      [null, Validators.required],
-      imageUrl:         [null, Validators.required],
-      trackCount:       [null, Validators.required],
-      tracks:           [null, Validators.required],
       posterId:         [null, Validators.required]
     });
 
@@ -80,8 +65,10 @@ export class RoundAlbumsListComponent implements OnInit {
 
     this.albumToUpdateId = null;
 
-    this.albumForm.get('albumSearchQuery').valueChanges.subscribe((query) => {
-      this.searchForAlbum(query);
+    // Update album search results upon every query change
+    this.albumForm.get('albumSearchQuery').valueChanges.subscribe((query: string) => {
+      if (query !== null && query.length > 0)
+        this.searchForAlbum(query);
     });
   }
 
@@ -121,110 +108,64 @@ export class RoundAlbumsListComponent implements OnInit {
     return albumListItem;
   }
 
+  /**
+   * Upon selecting an album list item.
+   * @param albumListItem the selected album list item
+   */
   selectAlbumListItem(albumListItem: IAlbumListItem): void {
-    if (albumListItem === undefined) return;
+    if (albumListItem === undefined)
+      return;
+
     this.selectedAlbum = albumListItem.album;
     this.albumSelectEvent.emit(albumListItem.album);
   }
 
-  async searchForAlbum(query: string): Promise<any> {
-    const searchResults = await this.httpClient.get<any>(`http://localhost:80/api/album-search?q=${query}`).toPromise();
-    this.searchAlbumListItems = (searchResults.items.length > 0) ? searchResults.items : [];
+  /**
+   * Upon searching for an album.
+   * @param query album search query
+   */
+  searchForAlbum(query: string): void {
+    this.httpClient.get<any>(`http://localhost:80/api/album-search?q=${query}`).subscribe((searchResults: any) => {
+      this.albumSearchListItems = (searchResults.items.length > 0) ? searchResults.items : [];
+    });
   }
 
   /**
    * Upon selecting an album search result.
    * @param spotifyAlbum item from a Spotify album search result
    */
-  async selectAlbumSearchResult(spotifyAlbum: any): Promise<void> {
-    this.selectedAlbumSearchResultSpotifyId = spotifyAlbum.id;
-
-    // Get album artists and their associated genres
-    let artists: string[] = [];
-    let artistGenres: string[] = [];
-    for (let artist of spotifyAlbum.artists) {
-      const artistData = await this.httpClient.get<any>(`http://localhost:80/api/artist?id=${artist.id}`).toPromise();
-      artists.push(artist.name);
-      artistGenres.push(...artistData.genres);
-    }
-
-    try {
-      // Get album tracks
-      let tracksResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-album-tracks?spotifyAlbumId=${spotifyAlbum.id}`).toPromise();
-
-      const trackPromises = tracksResult.items.map(async (track) => {
-        let audioFeatures: any = null;
-
-        try {
-          const audioFeaturesResult = await this.httpClient.get<any>(`http://localhost:80/api/spotify-audio-features?spotifyTrackId=${track.id}`).toPromise();
-
-          const timeSignature: string = audioFeaturesResult.time_signature + '/4';
-          const mode: string = (audioFeaturesResult.mode === 1) ? 'major' : 'minor';
-          const key: string = (audioFeaturesResult.key === -1) ? 'N/A' : this.pitchNotations[0];
-
-          audioFeatures = {
-            tempo:            audioFeaturesResult.tempo,
-            timeSignature:    timeSignature,
-            key:              key,
-            mode:             mode,
-            acousticness:     audioFeaturesResult.acousticness,
-            energy:           audioFeaturesResult.energy,
-            danceability:     audioFeaturesResult.danceability,
-            instrumentalness: audioFeaturesResult.instrumentalness,
-            liveness:         audioFeaturesResult.liveness,
-            speechiness:      audioFeaturesResult.speechiness,
-            valence:          audioFeaturesResult.valence
-          };
-        } catch (err: any) { }
-
-        return Promise.resolve({
-          title:              track.name,
-          diskNumber:         track.disc_number,
-          trackNumber:        track.track_number,
-          duration:           track.duration_ms,
-          audioFeatures:      audioFeatures,
-          pickerIds: []
-        });
-      });
-
-      const tracks = await Promise.all(trackPromises);
-
-      // Populate form with album data
-      this.albumForm.controls.spotifyId.setValue(spotifyAlbum.id);
-      this.albumForm.controls.title.setValue(spotifyAlbum.name);
-      this.albumForm.controls.trackCount.setValue(spotifyAlbum.total_tracks);
-      this.albumForm.controls.releaseDate.setValue(spotifyAlbum.release_date);
-      this.albumForm.controls.imageUrl.setValue(spotifyAlbum.images[1].url);
-      this.albumForm.controls.artists.setValue(artists);
-      this.albumForm.controls.artistGenres.setValue(artistGenres);
-      this.albumForm.controls.tracks.setValue(tracks);
-    } catch(err: any) {
-      alert(`${err.status} ${err.statusText}:\nCould not load data for '${spotifyAlbum.name}'`);
-    }
+  selectAlbumSearchResult(spotifyAlbum: any): void {
+    this.albumForm.controls.spotifyId.setValue(spotifyAlbum.id);
   }
 
-  async submitAlbumForm(): Promise<void> {
-    const formValues: IAlbumForm = this.albumForm.value as IAlbumForm;
+  /**
+   * Upon submitting the album form.
+   */
+  submitAlbumForm(): void {
+    const albumFormValues: IAlbumForm = this.albumForm.value as IAlbumForm;
 
     if (this.albumToUpdateId === null) {
-      this.createAlbum(formValues);
+      this.createAlbum(albumFormValues.spotifyId, albumFormValues.posterId);
     } else {
-      this.updateAlbum(formValues);
+      this.updateAlbum(albumFormValues.spotifyId, albumFormValues.posterId);
     }
 
-    // Clear album search results
-    this.searchAlbumListItems = [];
-    this.selectedAlbumSearchResultSpotifyId = null;
+    this.clearAlbumForm();
 
     // Close the album form modal
     document.getElementById('album-modal-close-button').click();
   }
 
-  async createAlbum(albumInfo: any): Promise<void> {
+  /**
+   * Create an album.
+   * @param spotifyId Spotify ID of the album
+   * @param posterId  member ID of the album poster
+   */
+  async createAlbum(spotifyId: string, posterId: string): Promise<void> {
     // Create the album
-    const album: IAlbum = await this.modelService.createAlbum(albumInfo, this.round);
+    const album: IAlbum = await this.modelService.createAlbum(spotifyId, posterId, this.round);
 
-    // Create the album list item
+    // Create a list item for the album
     const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
 
     // Add the album list item to the list
@@ -235,9 +176,14 @@ export class RoundAlbumsListComponent implements OnInit {
     this.roundListItemsService.addAlbum(album, this.round);
   }
 
-  async updateAlbum(albumInfo: any): Promise<void> {
+  /**
+   * Update an album.
+   * @param spotifyId Spotify ID of the album
+   * @param posterId  member ID of the album poster
+   */
+  async updateAlbum(spotifyId: string, posterId: string): Promise<void> {
     // Update the album in the database
-    const updatedAlbum: IAlbum = await this.modelService.updateAlbum(this.albumToUpdateId, albumInfo).toPromise();
+    const updatedAlbum: IAlbum = await this.modelService.updateAlbum(spotifyId, posterId).toPromise();
 
     // Update the album in its round list item
     for (let albumListItem of this.albumListItems) {
@@ -263,20 +209,10 @@ export class RoundAlbumsListComponent implements OnInit {
     this.albumToUpdateId = null;
   }
 
-  populateAlbumForm(album: IAlbum): void {
-    // Don't click any elements under the edit button
-    event.stopPropagation();
-
-    // Set album form values
-    this.albumForm.controls.title.setValue(album.title);
-    this.albumForm.controls.artists.setValue(album.artists);
-    this.albumForm.controls.trackCount.setValue(album.trackCount);
-    this.albumForm.controls.imageUrl.setValue(album.imageUrl);
-    this.albumForm.controls.posterId.setValue(album.posterId);
-
-    this.albumToUpdateId = album.id;
-  }
-
+  /**
+   * Delete an album.
+   * @param albumToDelete album to delete
+   */
   async deleteAlbum(albumToDelete: IAlbum): Promise<void> {
     // Don't click any elements under the delete button
     event.stopPropagation();
@@ -296,14 +232,33 @@ export class RoundAlbumsListComponent implements OnInit {
     this.modelService.updateRound(this.round.id, {}).toPromise();
   }
 
-  clearAlbumForm(): void {
-    this.albumForm.reset();
+  /**
+   * Populate the album form fields.
+   * @param album album to populate with
+   */
+  populateAlbumForm(album: IAlbum): void {
+    // Don't click any elements under the edit button
+    event.stopPropagation();
 
-    // Clear album search results
-    this.searchAlbumListItems = [];
-    this.selectedAlbumSearchResultSpotifyId = null;
+    // Set album form values
+    this.albumForm.controls.albumSearchQuery.setValue(album.title);
+    this.albumForm.controls.spotifyId.setValue(album.spotifyId);
+    this.albumForm.controls.posterId.setValue(album.posterId);
+
+    this.albumToUpdateId = album.id;
   }
 
+  /**
+   * Clear the album form.
+   */
+  clearAlbumForm(): void {
+    this.albumForm.reset();
+    this.albumSearchListItems = [];
+  }
+
+  /**
+   * Sort the album list items by poster name.
+   */
   sortAlbumListItems(): void {
     this.albumListItems = this.albumListItems.sort((a, b) => {
       if (a.poster.lastName < b.poster.lastName)
