@@ -10,6 +10,10 @@ h3 {
   font-style: italic;
 }
 
+h4 {
+  color: #666;
+}
+
 .poster-icon {
   min-width: 56px;
   min-height: 56px;
@@ -28,15 +32,6 @@ h3 {
   color: red;
 }
 
-#add-picked-track-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background-color: #212529;
-  color: white;
-}
-
 .scrollable-list-group {
   position: absolute;
   left: 0;
@@ -49,9 +44,10 @@ h3 {
 
 .list-group-item {
   padding: 0.4rem 0.6rem;
+  cursor: pointer;
 }
 
-.picked-track-list-item-overlay {
+.track-list-item-overlay {
   position: absolute;
   left: 0px;
   top: 0px;
@@ -66,7 +62,7 @@ h3 {
   height: 100%;
 }
 
-.picked-track-list-item-overlay:hover .hover-panel {
+.track-list-item-overlay:hover .hover-panel {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -82,11 +78,11 @@ h3 {
   font-size: 12px;
 }
 
-.picked-track-list-item p {
+.track-list-item p {
   margin: 0px;
 }
 
-.picked-track-title {
+.track-title {
   font-size: 14px;
 }
 

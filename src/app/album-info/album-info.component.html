@@ -1,9 +1,6 @@
 <div class="h-100 p-3 ">
-
   <div class="h-100 p-3 d-flex flex-column border rounded" id="album-info">
-
     <header class="mb-2 d-flex justify-content-between">
-
       <div>
         <h3>{{ album.title }}</h3>
         <h4>{{ album.artists.join(', ') }}</h4>
@@ -14,91 +11,62 @@
         <p class="m-0">{{ poster.firstName[0] + poster.lastName[0] }}</p>
       </div>
       -->
-
     </header>
 
     <div class="mb-2 d-flex justify-content-between align-items-center">
-      <h5 class="m-0">Picked Tracks (of {{ album.trackCount }})</h5>
+      <small class="mr-3 metrics-warning" *ngIf="remainingVotes > 0">Missing {{ remainingVotes }} vote(s)</small>
+      <small class="mr-3 metrics-warning" *ngIf="remainingVotes < 0">Has {{ -remainingVotes }} extra vote(s)</small>
 
-      <div class="">
-        <small class="mr-3 metrics-warning" *ngIf="remainingVotes > 0">Missing {{ remainingVotes }} vote(s)</small>
-        <small class="mr-3 metrics-warning" *ngIf="remainingVotes < 0">Has {{ -remainingVotes }} extra vote(s)</small>
+      <small class="mr-3" title="Vote overlap percentage. There is 0% overlap if everyone votes for different songs. Likewise, there is 100% overlap if everyone votes for the same number of songs as there are votes per person." *ngIf="remainingVotes === 0"><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.0-0' }}%</small>
 
-        <small class="mr-3" title="Vote overlap percentage. There is 0% overlap if everyone votes for different songs. Likewise, there is 100% overlap if everyone votes for the same number of songs as there are votes per person." *ngIf="remainingVotes === 0"><i class="fas fa-handshake"></i> {{ concensusScore | number : '1.0-0' }}%</small>
-
-        <small class="mr-3" title="The percentage of liked songs out of the whole album." *ngIf="remainingVotes === 0"><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
-
-        <button id="add-picked-track-button" type="button" name="button" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
-          <i class="fas fa-plus"></i>
-        </button>
-      </div>
+      <small class="mr-3" title="The percentage of liked songs out of the whole album." *ngIf="remainingVotes === 0"><i class="fas fa-arrows-alt-h"></i> {{ coverage | number : '1.0-0' }}%</small>
     </div>
 
     <div class="flex-grow-1 position-relative">
       <div class="h-100 p-2 list-group scrollable-list-group">
-
-        <div class="position-relative list-group-item picked-track-list-item" [class.top-track]="album.topTrackNumber !== null && album.topTrackNumber === pickedTrackListItem.pickedTrack.trackNumber" *ngFor="let pickedTrackListItem of pickedTrackListItems">
-
+        <div
+          class="position-relative list-group-item list-group-item-action track-list-item"
+          [class.top-track]="album.topTrackNumber === trackListItem.track.trackNumber"
+          *ngFor="let trackListItem of trackListItems"
+          (click)="populateTrackForm(trackListItem.track)"
+          data-bs-toggle="modal" data-bs-target="#track-form-modal">
           <div class="d-flex justify-content-between align-items-center">
-
-            <p class="picked-track-title">{{ pickedTrackListItem.pickedTrack.trackNumber }}. {{ pickedTrackListItem.pickedTrack.title }}</p>
+            <p class="track-title">{{ trackListItem.track.trackNumber }}. {{ trackListItem.track.title }}</p>
 
             <div class="d-flex">
-              <div class="picker-icon d-flex justify-content-center align-items-center mr-1" *ngFor="let picker of pickedTrackListItem.pickers" [style.background-color]="picker.color">
+              <div
+                class="picker-icon d-flex justify-content-center align-items-center mr-1"
+                *ngFor="let picker of trackListItem.pickers"
+                [style.background-color]="picker.color">
                 <p *ngIf="picker !== null">{{ picker.firstName[0] + picker.lastName[0] }}</p>
               </div>
             </div>
-
           </div>
-
-          <div class="picked-track-list-item-overlay">
-            <div class="hover-panel p-1">
-              <!-- Edit button -->
-              <button class="btn btn-secondary hover-panel-button mr-1" type="button" name="button" (click)="populatePickedTrackForm(pickedTrackListItem.pickedTrack)" data-bs-toggle="modal" data-bs-target="#picked-track-form-modal">
-                <i class="fas fa-edit"></i>
-              </button>
-
-              <!-- Delete button -->
-              <button class="btn btn-danger hover-panel-button" type="button" name="button"  (click)="deletePickedTrack(pickedTrackListItem.pickedTrack)">
-                <i class="fas fa-times"></i>
-              </button>
-
-            </div>
-          </div>
-
         </div>
-
       </div>
     </div>
-
   </div>
-
 </div>
 
-<!-- Picked track form modal -->
-<div class="modal fade" id="picked-track-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<!-- Track form modal -->
+<div class="modal fade" id="track-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Picked Track Editor</h5>
+        <h5 class="modal-title" id="staticBackdropLabel">Track Editor</h5>
       </div>
 
       <div class="modal-body">
-        <form id="picked-track-form" [formGroup]="pickedTrackForm" (ngSubmit)="submitPickedTrackForm()" class="needs-validation">
-
+        <form id="track-form" [formGroup]="trackForm" (ngSubmit)="submitTrackForm()" class="needs-validation">
           <div class="row">
-
-            <div class="col-6">
-
+            <div class="col">
               <div class="form-group mb-3">
-                <label class="form-label" title="The title of the track.">Title</label>
-                <input type="text" formControlName="title" class="form-control form-control-sm" autocomplete="off" required appFocused/>
-              </div>
-
-              <div class="form-group mb-3">
-                <label class="form-label" title="The track number in its album.">Track #</label>
-                <input type="number" formControlName="trackNumber" class="form-control form-control-sm" min="1" [max]="album.trackCount" required/>
+                <label class="form-label" title="The participants who voted for this track.">Pickers</label>
+                <div class="form-check" formArrayName="pickerIds" *ngFor="let control of pickerIdsFormArray.controls; let i = index">
+                  <input class="form-check-input" type="checkbox" [formControlName]="i" value="">
+                  <label class="form-check-label">{{ participants[i].firstName }} {{ participants[i].lastName }}</label>
+                </div>
               </div>
 
               <div class="form-group">
@@ -107,27 +75,14 @@
                   <label class="form-check-label" for="flexCheckDefault" title="Was this the top voted track?">Is Top Track?</label>
                 </div>
               </div>
-
             </div>
-
-            <div class="col-6">
-              <div class="form-group">
-                <label class="form-label" title="The participants who voted for this track.">Pickers</label>
-                <div class="form-check" formArrayName="pickerIds" *ngFor="let control of pickerIdsFormArray.controls; let i = index">
-                  <input class="form-check-input" type="checkbox" [formControlName]="i" value="">
-                  <label class="form-check-label">{{ participants[i].firstName }} {{ participants[i].lastName }}</label>
-                </div>
-              </div>
             </div>
-
-          </div>
-
         </form>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-sm btn-secondary" id="picked-track-modal-close-button" data-bs-dismiss="modal" (click)="clearPickedTrackForm()">Cancel</button>
-        <button type="submit" form="picked-track-form" class="btn btn-sm btn-primary" [disabled]="!pickedTrackForm.valid">Save</button>
+        <button type="button" class="btn btn-sm btn-secondary" id="track-modal-close-button" data-bs-dismiss="modal" (click)="clearTrackForm()">Cancel</button>
+        <button type="submit" form="track-form" class="btn btn-sm btn-primary" [disabled]="!trackForm.valid">Save</button>
       </div>
     </div>
   </div>

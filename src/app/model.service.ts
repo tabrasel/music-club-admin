@@ -76,16 +76,18 @@ export class ModelService {
 
   /**
    * Creates an album.
-   * @param albumInfo information describing the album
+   * @param spotifyId Spotify ID of the album
+   * @param posterId  member ID of the album poster
    * @param round     the round the album should be posted to
    * @return a new album
    */
-  async createAlbum(albumInfo: any, round: IRound) {
+  async createAlbum(spotifyId: string, posterId: string, round: IRound): Promise<IAlbum> {
     // Create album in database
-    const createdAlbum: IAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumInfo).toPromise();
+    const albumParams: any = { spotifyId, posterId };
+    const createdAlbum: IAlbum = await this.httpClient.post<any>(this.hostUrl + 'api/album', albumParams).toPromise();
 
     // Add album to poster's list of posted albums and add round to the poster's list of participated rounds
-    const poster: IMember = await this.getMember(albumInfo.posterId).toPromise();
+    const poster: IMember = await this.getMember(posterId).toPromise();
 
     poster.participatedRoundIds.push(round.id);
     poster.postedAlbumIds.push(createdAlbum.id);
@@ -95,7 +97,7 @@ export class ModelService {
       postedAlbumIds: poster.postedAlbumIds
     };
 
-    this.updateMember(poster.id, posterNewData).subscribe();
+    this.updateMember(posterId, posterNewData).subscribe();
 
     // Add album to its round
     round.albumIds.push(createdAlbum.id);
@@ -109,9 +111,9 @@ export class ModelService {
    * @param id          the id of the album to update
    * @param updatedData the updated album values
    */
-  updateAlbum(id: string, updatedData: any): Observable<IAlbum> {
+  async updateAlbum(id: string, updateData: any): Promise<IAlbum> {
     // TODO: Update original and new poster's posted albums
-    return this.httpClient.put<IAlbum>(this.hostUrl + 'api/album?id=' + id, updatedData);
+    return this.httpClient.put<IAlbum>(`${this.hostUrl}api/album?id=${id}`, updateData).toPromise();
   }
 
   /**
@@ -133,7 +135,7 @@ export class ModelService {
     };
     this.updateMember(poster.id, posterNewData).subscribe();
 
-    // Delete the album from the database    
+    // Delete the album from the database
     return this.httpClient.delete<IAlbum>(`${this.hostUrl}api/album?id=${albumToDelete.id}`).toPromise();
   }
 
@@ -152,7 +154,7 @@ export class ModelService {
     const newData: any = {
       pickedTracks: album.pickedTracks.filter(pickedTrack => pickedTrack.trackNumber !== pickedTrackToDelete.trackNumber)
     };
-    this.updateAlbum(album.id, newData).subscribe();
+    this.updateAlbum(album.id, newData);
   }
 
   // Member model //////////////////////////////////////////////////////////////////////////////////////////////////////

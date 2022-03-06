@@ -65,7 +65,7 @@
               <input type="text" formControlName="albumSearchQuery" class="form-control form-control-sm mb-2" autocomplete="off" placeholder="Search albums" required/>
 
               <div id="search-results-list" class="list-group p-2">
-                <div class="search-result-list-item list-group-item list-group-item-action d-flex p-1" *ngFor="let album of searchAlbumListItems" [class.active]="selectedAlbumSearchResultSpotifyId != null && album.id === selectedAlbumSearchResultSpotifyId" (click)="selectAlbumSearchResult(album)">
+                <div class="search-result-list-item list-group-item list-group-item-action d-flex p-1" *ngFor="let album of albumSearchListItems" [class.active]="album.id === this.albumForm.controls.spotifyId.value" (click)="selectAlbumSearchResult(album)">
                   <img [src]="album.images[2].url" class="mr-1" />
                   <div>
                     <h1>{{ album.name }}</h1>
