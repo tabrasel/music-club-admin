@@ -147,7 +147,7 @@ export class RoundAlbumsListComponent implements OnInit {
     if (this.albumToUpdateId === null) {
       this.createAlbum(albumFormValues.spotifyId, albumFormValues.posterId);
     } else {
-      this.updateAlbum(albumFormValues.spotifyId, albumFormValues.posterId);
+      this.updateAlbum(this.albumToUpdateId, albumFormValues.spotifyId, albumFormValues.posterId);
     }
 
     this.clearAlbumForm();
@@ -163,29 +163,31 @@ export class RoundAlbumsListComponent implements OnInit {
    */
   async createAlbum(spotifyId: string, posterId: string): Promise<void> {
     // Create the album
-    const album: IAlbum = await this.modelService.createAlbum(spotifyId, posterId, this.round);
+    const createdAlbum: IAlbum = await this.modelService.createAlbum(spotifyId, posterId, this.round);
 
     // Create a list item for the album
-    const albumListItem: IAlbumListItem = await this.createAlbumListItem(album);
+    const albumListItem: IAlbumListItem = await this.createAlbumListItem(createdAlbum);
 
     // Add the album list item to the list
     this.albumListItems.push(albumListItem);
     this.sortAlbumListItems();
 
     // Add the album to its round list item
-    this.roundListItemsService.addAlbum(album, this.round);
+    this.roundListItemsService.addAlbum(createdAlbum, this.round);
   }
 
   /**
    * Update an album.
-   * @param spotifyId Spotify ID of the album
+   * @param id        ID of the album to update
+   * @param spotifyId Spotify ID of the new album
    * @param posterId  member ID of the album poster
    */
-  async updateAlbum(spotifyId: string, posterId: string): Promise<void> {
+  async updateAlbum(id: string, spotifyId: string, posterId: string): Promise<void> {
     // Update the album in the database
-    const updatedAlbum: IAlbum = await this.modelService.updateAlbum(spotifyId, posterId).toPromise();
+    const updateData: any = { spotifyId, posterId };
+    const updatedAlbum: IAlbum = await this.modelService.updateAlbum(id, updateData);
 
-    // Update the album in its round list item
+    // Update the album's list item
     for (let albumListItem of this.albumListItems) {
       if (albumListItem.album.id === this.albumToUpdateId) {
         albumListItem.album = updatedAlbum;
@@ -196,16 +198,15 @@ export class RoundAlbumsListComponent implements OnInit {
     // Sort the album list items in case the update changed the poster name
     this.sortAlbumListItems();
 
-    // Refresh the currently selected album
-    this.selectedAlbum = updatedAlbum;
-    this.albumSelectEvent.emit(updatedAlbum);
-
     // Update the album in its round list item
     this.roundListItemsService.updateAlbum(updatedAlbum, this.round);
 
     // Update round
     this.modelService.updateRound(this.round.id, {}).toPromise();
 
+    // Refresh the currently selected album
+    this.selectedAlbum = updatedAlbum;
+    this.albumSelectEvent.emit(updatedAlbum);
     this.albumToUpdateId = null;
   }
 

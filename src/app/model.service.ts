@@ -111,9 +111,9 @@ export class ModelService {
    * @param id          the id of the album to update
    * @param updatedData the updated album values
    */
-  updateAlbum(id: string, updatedData: any): Observable<IAlbum> {
+  async updateAlbum(id: string, updateData: any): Promise<IAlbum> {
     // TODO: Update original and new poster's posted albums
-    return this.httpClient.put<IAlbum>(this.hostUrl + 'api/album?id=' + id, updatedData);
+    return this.httpClient.put<IAlbum>(`${this.hostUrl}api/album?id=${id}`, updateData).toPromise();
   }
 
   /**
@@ -154,7 +154,7 @@ export class ModelService {
     const newData: any = {
       pickedTracks: album.pickedTracks.filter(pickedTrack => pickedTrack.trackNumber !== pickedTrackToDelete.trackNumber)
     };
-    this.updateAlbum(album.id, newData).subscribe();
+    this.updateAlbum(album.id, newData);
   }
 
   // Member model //////////////////////////////////////////////////////////////////////////////////////////////////////

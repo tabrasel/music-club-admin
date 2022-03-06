@@ -7,18 +7,19 @@ import { IRound } from '../interfaces/IRound';
 
 import { ModelService } from '../model.service';
 
-interface IPickedTrack {
+interface ITrack {
   title: string;
+  diskNumber: number;
   trackNumber: number;
   pickerIds: string[];
 }
 
-interface IPickedTrackListItem {
-  pickedTrack: IPickedTrack,
+interface ITrackListItem {
+  track: ITrack,
   pickers: IMember[]
 }
 
-interface IPickedTrackForm {
+interface ITrackForm {
   title: string;
   trackNumber: number;
   isTopTrack: boolean;
@@ -32,11 +33,11 @@ interface IPickedTrackForm {
 })
 export class AlbumInfoComponent implements OnInit {
 
-  pickedTrackForm: FormGroup;
-  pickedTrackListItems: any[];
+  trackForm: FormGroup;
+  trackListItems: ITrackListItem[];
   poster: IMember;
   pickerIdsControl: FormArray;
-  pickedTrackToUpdate: IPickedTrack;
+  trackToUpdate: ITrack;
   remainingVotes: number;
 
   // Album metrics
@@ -56,27 +57,25 @@ export class AlbumInfoComponent implements OnInit {
 
     this.pickerIdsControl = new FormArray([]);
 
-    // Define the picked track form
-    this.pickedTrackForm = this.formBuilder.group({
-      title: [null, Validators.required],
-      trackNumber: [null, Validators.required],
+    // Define the track form
+    this.trackForm = this.formBuilder.group({
       isTopTrack: [null],
       pickerIds: this.pickerIdsControl
     });
   }
 
   get pickerIdsFormArray() {
-    return this.pickedTrackForm.controls.pickerIds as FormArray;
+    return this.trackForm.controls.pickerIds as FormArray;
   }
 
   ngOnInit(): void {
     this.calculateMetrics();
 
-    this.pickedTrackToUpdate = null;
+    this.trackToUpdate = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.loadPickedTrackListItems();
+    this.loadTrackListItems();
 
     this.modelService.getMember(this.album.posterId).subscribe(poster => {
       this.poster = poster;
@@ -87,10 +86,11 @@ export class AlbumInfoComponent implements OnInit {
       this.pickerIdsControl.push(new FormControl(false));
     });
 
-    this.calculateMetrics();
+    //this.calculateMetrics();
   }
 
   calculateMetrics(): void {
+    /*
     const trackCount = this.album.trackCount;
     const pickedTracksCount = this.album.pickedTracks.length;
     const participantsCount = this.participants.length;
@@ -107,181 +107,120 @@ export class AlbumInfoComponent implements OnInit {
 
     this.concensusScore = (1 - ((pickedTracksCount - picksPerParticipant) / (picksPerParticipant * participantsCount - picksPerParticipant))) * 100;
     this.coverage = pickedTracksCount / trackCount * 100;
+    */
   }
 
-  async createPickedTrackListItem(pickedTrack: IPickedTrack): Promise<IPickedTrackListItem> {
+  async createTrackListItem(track: any): Promise<ITrackListItem> {
     // Create promises for the pickers
     const pickerPromises: Promise<IMember>[] = [];
-    for (let pickerId of pickedTrack.pickerIds) {
+    for (let pickerId of track.pickerIds) {
       const pickerPromise: Promise<IMember> = this.modelService.getMember(pickerId).toPromise();
       pickerPromises.push(pickerPromise);
     }
 
-    // Create list item once all pickers are loaded
+    // Create track list item
     return Promise.all(pickerPromises)
       .then(pickers => {
-        const pickedTrackListItem: IPickedTrackListItem = {
-          pickedTrack: pickedTrack,
+        const trackListItem: ITrackListItem = {
+          track: track,
           pickers: pickers
         };
-        return pickedTrackListItem;
+        return trackListItem;
       })
       .catch(error => {
         return null;
       })
   }
 
-  loadPickedTrackListItems(): void {
+  loadTrackListItems(): void {
     if (this.album === null) return;
 
-    const pickedTrackListItemPromises: Promise<IPickedTrackListItem>[] = this.album.pickedTracks.map(async pickedTrack => {
-      return this.createPickedTrackListItem(pickedTrack);
+    const trackListItemPromises: Promise<ITrackListItem>[] = this.album.tracks.map(async (track: any) => {
+      return this.createTrackListItem(track);
     });
 
-    // Once all picked track list items are created
-    Promise.all(pickedTrackListItemPromises).then(pickedTrackListItems => {
-      // Sort picked track list items by track number
-      this.pickedTrackListItems = pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
+    // Sort track list items by track number
+    Promise.all(trackListItemPromises).then(trackListItems => {
+      this.trackListItems = trackListItems.sort((a, b) => a.track.trackNumber < b.track.trackNumber ? -1 : 1);
     });
   }
 
-  populatePickedTrackForm(pickedTrack: IPickedTrack): void {
+  populateTrackForm(track: ITrack): void {
     // Don't click any elements under the edit button
     event.stopPropagation();
 
-    // Set picked track form values
-    this.pickedTrackForm.controls.title.setValue(pickedTrack.title);
-    this.pickedTrackForm.controls.trackNumber.setValue(pickedTrack.trackNumber);
-    this.pickedTrackForm.controls.isTopTrack.setValue(pickedTrack.trackNumber === this.album.topTrackNumber);
+    // Set track form values
+    this.trackForm.controls.isTopTrack.setValue(track.trackNumber === this.album.topTrackNumber);
 
     this.pickerIdsControl.clear();
-    this.participants.forEach(participant => {
-      const checked: boolean = pickedTrack.pickerIds.indexOf(participant.id) !== -1;
+    this.participants.forEach((participant) => {
+      const checked: boolean = track.pickerIds.indexOf(participant.id) !== -1;
       this.pickerIdsControl.push(new FormControl(checked));
     });
 
-    this.pickedTrackToUpdate = pickedTrack;
+    this.trackToUpdate = track;
   }
 
-  async submitPickedTrackForm(): Promise<void> {
-    const form: IPickedTrackForm = this.pickedTrackForm.value as IPickedTrackForm;
+  async submitTrackForm(): Promise<void> {
+    const form: ITrackForm = this.trackForm.value as ITrackForm;
 
-    // Abort if track number is invalid
-    if (form.trackNumber < 1) {
-      alert('Track number cannot be less than 1.');
-      return;
-    }
-
-    if (form.trackNumber > this.album.trackCount) {
-      alert('Track number cannot exceed the number of tracks in album "' + this.album.title + '" (' + this.album.trackCount + ' tracks).');
-      return;
-    }
-
-    // Set the picked track's pickers
-    const selectedPickerIds = this.pickedTrackForm.value.pickerIds
+    // Set the track's pickers
+    const selectedPickerIds = this.trackForm.value.pickerIds
       .map((checked, i) => checked ? this.participants[i].id : null)
       .filter(v => v !== null);
 
-    // Define the picked track
-    const pickedTrack: IPickedTrack = {
-      title: form.title.trim(),
-      trackNumber: form.trackNumber,
+    // Define the updated track
+    const track: ITrack = {
+      ...this.trackToUpdate,
       pickerIds: selectedPickerIds
     };
 
-    if (this.pickedTrackToUpdate === null) {
-      // Abort if the album already has a track with the same track number
-      for (let pickedTrack of this.album.pickedTracks) {
-        if (form.trackNumber === pickedTrack.trackNumber) {
-          alert('The album "' + this.album.title + '" already has a track #' + form.trackNumber + '.');
-          return;
-        }
+    // Update the picked track's album in the database
+    const updateData = {};
+
+    // Update picked track in the selected album
+    for (let i = 0; i < this.album.tracks.length; i++) {
+      if (this.album.tracks[i].trackNumber === this.trackToUpdate.trackNumber) {
+        this.album.tracks[i] = track;
+        break;
       }
+    }
+    updateData['tracks'] = this.album.tracks;
 
-      // Update the picked track's album in the database
-      const newAlbumData = {};
-
-      // Add picked track to the selected album
-      this.album.pickedTracks.push(pickedTrack);
-      newAlbumData['pickedTracks'] = this.album.pickedTracks;
-
-      // Set picked track as top track in its album if it's selected
-      if (form.isTopTrack) {
-        this.album.topTrackNumber = form.trackNumber;
-        newAlbumData['topTrackNumber'] = form.trackNumber;
-      }
-
-      this.modelService.updateAlbum(this.album.id, newAlbumData).subscribe();
-
-      // Create a list item for the picked track
-      this.createPickedTrackListItem(pickedTrack)
-        .then(pickedTrackListItem => {
-          // Add the picked track list item to the list
-          this.pickedTrackListItems.push(pickedTrackListItem);
-
-          // Sort picked track list items by track number
-          this.pickedTrackListItems.sort((a, b) => a.pickedTrack.trackNumber < b.pickedTrack.trackNumber ? -1 : 1);
-        });
+    // Set track as top track in the album if it's marked so
+    if (form.isTopTrack) {
+      this.album.topTrackNumber = form.trackNumber;
+      updateData['topDiskNumber'] = this.trackToUpdate.diskNumber;
+      updateData['topTrackNumber'] = this.trackToUpdate.trackNumber;
     } else {
-      // Update the picked track's album in the database
-      const newAlbumData = {};
-
-      // Update picked track in the selected album
-      for (let i = 0; i < this.album.pickedTracks.length; i++) {
-        if (this.album.pickedTracks[i].trackNumber === this.pickedTrackToUpdate.trackNumber) {
-          this.album.pickedTracks[i] = pickedTrack;
-          break;
-        }
+      if (this.album.topTrackNumber === this.trackToUpdate.trackNumber) {
+        this.album.topDiskNumber = null;
+        this.album.topTrackNumber = null;
+        updateData['topDiskNumber'] = null;
+        updateData['topTrackNumber'] = null;
       }
-      newAlbumData['pickedTracks'] = this.album.pickedTracks;
-
-      // Set picked track as top track in its album if it's selected
-      if (form.isTopTrack) {
-        this.album.topTrackNumber = form.trackNumber;
-        newAlbumData['topTrackNumber'] = form.trackNumber;
-      } else {
-        if (this.album.topTrackNumber === this.pickedTrackToUpdate.trackNumber) {
-          this.album.topTrackNumber = null;
-          newAlbumData['topTrackNumber'] = null;
-        }
-      }
-
-      this.modelService.updateAlbum(this.album.id, newAlbumData).subscribe();
-
-      // Replace picked track's existing list item with a new one
-      for (let i = 0; i < this.pickedTrackListItems.length; i++) {
-        if (this.pickedTrackListItems[i].pickedTrack.trackNumber === this.pickedTrackToUpdate.trackNumber) {
-          this.pickedTrackListItems[i] = await this.createPickedTrackListItem(pickedTrack);
-          break;
-        }
-      }
-
-      this.pickedTrackToUpdate = null;
     }
 
-    // Close the picked track form modal
-    document.getElementById('picked-track-modal-close-button').click();
+    this.modelService.updateAlbum(this.album.id, updateData);
 
-    this.calculateMetrics();
+    // Replace track's existing list item with a new one
+    for (let i = 0; i < this.trackListItems.length; i++) {
+      if (this.trackListItems[i].track.trackNumber === this.trackToUpdate.trackNumber) {
+        this.trackListItems[i] = await this.createTrackListItem(track);
+        break;
+      }
+    }
+
+    this.trackToUpdate = null;
+
+    // Close the track form modal
+    document.getElementById('track-modal-close-button').click();
+
+    //this.calculateMetrics();
   }
 
-  clearPickedTrackForm(): void {
-    this.pickedTrackForm.reset();
-  }
-
-  async deletePickedTrack(deletedPickedTrack: IPickedTrack) {
-    // Don't click any elements under the delete button
-    event.stopPropagation();
-
-    if (!confirm('Really delete "' + deletedPickedTrack.title + '"?')) return;
-
-    // Delete the picked track from its album in the database
-    await this.modelService.deletePickedTrack(deletedPickedTrack, this.album);
-
-    // Remove the picked track's list item
-    this.pickedTrackListItems = this.pickedTrackListItems.filter(pickedTrackListItem => pickedTrackListItem.pickedTrack.trackNumber !== deletedPickedTrack.trackNumber);
-
-    this.calculateMetrics();
+  clearTrackForm(): void {
+    this.trackForm.reset();
   }
 
 }
